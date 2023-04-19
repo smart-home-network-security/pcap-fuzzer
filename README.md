@@ -1,2 +1,2 @@
 # pcap-tweaker
-Randomly edit fields in a PCAP file.
+Randomly edit packet fields in a PCAP file.
