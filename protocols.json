@@ -1,0 +1,72 @@
+{
+    "arp": {
+        "layer": 2
+    },
+
+    "ip": {
+        "layer": 3,
+        "fields": {
+            "SrcIP": "ip_addr",
+            "DstIP": "ip_addr"
+        }
+    },
+    "ipv6": {
+        "layer": 3
+    },
+    "icmp": {
+        "layer": 3
+    },
+    "icmpv6": {
+        "layer": 3
+    },
+
+    "tcp": {
+        "layer": 4,
+        "fields": {
+            "SrcPort": "int",
+            "DstPort": "int"
+        }
+    },
+    "udp": {
+        "layer": 4,
+        "fields": {
+            "SrcPort": "int",
+            "DstPort": "int"
+        }
+    },
+
+    "http": {
+        "layer": 7,
+        "fields": {
+            "Method": [
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "HEAD",
+                "OPTIONS",
+                "TRACE",
+                "CONNECT"
+            ],
+            "Path": "str"
+        }
+    },
+    "dns": {
+        "layer": 7
+    },
+    "mdns": {
+        "layer": 7
+    },
+    "ntp": {
+        "layer": 7
+    },
+    "dhcp": {
+        "layer": 7
+    },
+    "ssdp": {
+        "layer": 7
+    },
+    "coap": {
+        "layer": 7
+    }
+}
