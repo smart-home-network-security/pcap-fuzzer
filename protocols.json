@@ -3,15 +3,19 @@
         "layer": 2
     },
 
-    "ip": {
+    "IP": {
         "layer": 3,
         "fields": {
-            "SrcIP": "ip_addr",
-            "DstIP": "ip_addr"
+            "src": "ipv4",
+            "dst": "ipv4"
         }
     },
     "ipv6": {
-        "layer": 3
+        "layer": 3,
+        "fields": {
+            "src": "ipv6",
+            "dst": "ipv6"
+        }
     },
     "icmp": {
         "layer": 3
@@ -20,22 +24,22 @@
         "layer": 3
     },
 
-    "tcp": {
+    "TCP": {
         "layer": 4,
         "fields": {
-            "SrcPort": "int",
-            "DstPort": "int"
+            "sport": "port",
+            "dport": "port"
         }
     },
-    "udp": {
+    "UDP": {
         "layer": 4,
         "fields": {
-            "SrcPort": "int",
-            "DstPort": "int"
+            "sport": "port",
+            "dport": "port"
         }
     },
 
-    "http": {
+    "HTTP Request": {
         "layer": 7,
         "fields": {
             "Method": [
