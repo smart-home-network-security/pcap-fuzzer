@@ -11,7 +11,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo $GITHUB_WORKSPACE/.ci_scripts/install-dependencies.sh
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pip3 install -r $GITHUB_WORKSPACE/requirements.txt
 
       - name: Run script
         run: python3 $GITHUB_WORKSPACE/src/pcap-tweaker.py $GITHUB_WORKSPACE/traces/http-xiaomi-cloud.pcap
