@@ -55,32 +55,23 @@ if __name__ == "__main__":
 
         # Choose randomly if we edit this packet
         #if random.randint(0, 1) != 0:
-        if i != 3:
+        if i != 6:
             # Packet won't be edited
             # Go to next packet
             new_packets.append(packet)
             i += 1
             continue
 
-        # Packet will be edited
-        # Get packet highest layer
-        layer = packet.lastlayer()
+        # Edit packet if possible
 
-        # Check if layer is supported
-        if layer.name not in protocols:
-            # Layer not supported
-            # Go to next packet
+        try:
+            packet = Packet.init_packet(packet.lastlayer().name, packet, i)
+            packet.tweak()
+            new_packets.append(packet.get_packet())
+            i += 1
+        except ModuleNotFoundError:
             new_packets.append(packet)
             i += 1
-            continue
-
-        # Layer is supported
-        # Edit packet
-        packet = Packet.init_packet(layer.name, packet, i)
-        packet.tweak()
-
-        new_packets.append(packet.get_packet())
-        i += 1
 
     # Write output PCAP file
     scapy.wrpcap(args.output_pcap, new_packets)

@@ -23,6 +23,9 @@
     "icmpv6": {
         "layer": 3
     },
+    "igmp": {
+        "layer": 3
+    },
 
     "TCP": {
         "layer": 4,
@@ -61,12 +64,6 @@
             "opcode": "int[0,2]",
             "qr": "int[0,1]"
         }
-    },
-    "mdns": {
-        "layer": 7
-    },
-    "ntp": {
-        "layer": 7
     },
     "dhcp": {
         "layer": 7

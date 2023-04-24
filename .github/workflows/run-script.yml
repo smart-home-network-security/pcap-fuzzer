@@ -1,0 +1,14 @@
+name: Run script
+on: [push]
+
+jobs:
+
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run script
+        run: python3 $GITHUB_WORKSPACE/src/pcap-tweaker.py $GITHUB_WORKSPACE/traces/http-xiaomi-cloud.pcap

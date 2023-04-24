@@ -27,19 +27,15 @@ class Packet:
         :return: Packet of given protocol,
                  or generic Packet if protocol is not supported.
         """
-        try:
-            # Try creating specific packet if possible
-            protocol = protocol.replace(" ", "_")
-            if protocol == "IP" and packet.getfieldval("version") == 4:
-                protocol = "IPv4"
-            elif protocol == "IP" and packet.getfieldval("version") == 6:
-                protocol = "IPv6"
-            module = importlib.import_module(f"packet.{protocol}")
-            cls = getattr(module, protocol)
-            return cls(packet, id)
-        except ModuleNotFoundError:
-            # Impossible to create specific packet, create generic packet
-            return Packet(packet, id)
+        # Try creating specific packet if possible
+        protocol = protocol.replace(" ", "_")
+        if protocol == "IP" and packet.getfieldval("version") == 4:
+            protocol = "IPv4"
+        elif protocol == "IP" and packet.getfieldval("version") == 6:
+            protocol = "IPv6"
+        module = importlib.import_module(f"packet.{protocol}")
+        cls = getattr(module, protocol)
+        return cls(packet, id)
 
 
     def __init__(self, packet: scapy.Packet, id: int = 0) -> None:
