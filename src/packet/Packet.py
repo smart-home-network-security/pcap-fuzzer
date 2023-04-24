@@ -5,7 +5,6 @@ import re
 import random
 from ipaddress import IPv4Address, IPv6Address
 import scapy.all as scapy
-from scapy.layers import dhcp, dhcp6, dns, http, inet, inet6, l2, ntp
 
 class Packet:
 
@@ -28,7 +27,7 @@ class Packet:
                  or generic Packet if protocol is not supported.
         """
         # Try creating specific packet if possible
-        protocol = protocol.replace(" ", "_")
+        protocol = protocol.split()[0]
         if protocol == "IP" and packet.getfieldval("version") == 4:
             protocol = "IPv4"
         elif protocol == "IP" and packet.getfieldval("version") == 6:

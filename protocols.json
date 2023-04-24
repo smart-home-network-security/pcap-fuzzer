@@ -42,7 +42,7 @@
         }
     },
 
-    "HTTP Request": {
+    "HTTP": {
         "layer": 7,
         "fields": {
             "Method": [
@@ -65,7 +65,7 @@
             "qr": "int[0,1]"
         }
     },
-    "dhcp": {
+    "DHCP": {
         "layer": 7
     },
     "ssdp": {
