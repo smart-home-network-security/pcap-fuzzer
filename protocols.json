@@ -3,14 +3,14 @@
         "layer": 2
     },
 
-    "IP": {
+    "IPv4": {
         "layer": 3,
         "fields": {
             "src": "ipv4",
             "dst": "ipv4"
         }
     },
-    "ipv6": {
+    "IPv6": {
         "layer": 3,
         "fields": {
             "src": "ipv6",
@@ -55,8 +55,12 @@
             "Path": "str"
         }
     },
-    "dns": {
-        "layer": 7
+    "DNS": {
+        "layer": 7,
+        "fields": {
+            "opcode": "int[0,2]",
+            "qr": "int[0,1]"
+        }
     },
     "mdns": {
         "layer": 7
