@@ -118,14 +118,20 @@ class Packet:
                 # Generate a random IPv6 address
                 new_value = str(IPv6Address(random.randint(0, IPv6Address._ALL_ONES)))
             
+            elif value_type == "mac":
+                # Field value is a MAC address
+                # Generate a random MAC address
+                new_value = ":".join(["%02x" % random.randint(0, 255) for _ in range(6)])
+            
         # Set new value for field
         print(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
         self.layer.setfieldval(field, new_value)
 
-        # Update checksums
-        del self.packet.getlayer(1).len
-        del self.packet.getlayer(1).chksum
-        if self.packet.getlayer(2).name == "UDP":
-            del self.packet.getlayer(2).len
-        del self.packet.getlayer(2).chksum
-        self.packet = scapy.Ether(self.packet.build())
+        # Update checksums, if needed
+        if self.packet.haslayer("IP"):
+            del self.packet.getlayer("IP").len
+            del self.packet.getlayer("IP").chksum
+            if self.packet.getlayer(2).name == "UDP":
+                del self.packet.getlayer(2).len
+            del self.packet.getlayer(2).chksum
+            self.packet = scapy.Ether(self.packet.build())

@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
         # Choose randomly if we edit this packet
         #if random.randint(0, 1) != 0:
-        if i != 0:
+        if i != 1:
             # Packet won't be edited
             # Go to next packet
             new_packets.append(packet)
