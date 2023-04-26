@@ -5,6 +5,7 @@ Randomly edit packet fields in a PCAP file.
 import argparse
 import json
 import scapy.all as scapy
+from scapy.contrib import igmpv3
 from packet.Packet import Packet
 
 
@@ -45,12 +46,14 @@ if __name__ == "__main__":
 
         # Choose randomly if we edit this packet
         #if random.randint(0, 1) != 0:
-        if i != 1:
+        if i != 0 and i != 1:
             # Packet won't be edited
             # Go to next packet
             new_packets.append(packet)
             i += 1
             continue
+
+        # Testing stuff
 
         # Edit packet, if possible
         try:
@@ -63,4 +66,4 @@ if __name__ == "__main__":
             i += 1
 
     # Write output PCAP file
-    scapy.wrpcap(args.output_pcap, new_packets)
+    #scapy.wrpcap(args.output_pcap, new_packets)

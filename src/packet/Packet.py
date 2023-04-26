@@ -7,12 +7,42 @@ from ipaddress import IPv4Address, IPv6Address
 import scapy.all as scapy
 
 class Packet:
+    """
+    Wrapper around the Scapy `Packet` class.
+    """
 
     # List of all alphanumerical characters
     ALPHANUM = list(bytes(string.ascii_letters + string.digits, "utf-8"))
 
     # Modifiable fields, will be overridden by child classes
     fields = {}
+
+
+    @staticmethod
+    def random_mac_address() -> str:
+        """
+        Generate a random MAC address.
+
+        :return: Random MAC address.
+        """
+        return ":".join(["%02x" % random.randint(0, 255) for _ in range(6)])
+
+
+    @staticmethod
+    def random_ip_address(version: int = 4) -> str:
+        """
+        Generate a random IP address.
+
+        :param version: IP version (4 or 6).
+        :return: Random IP address.
+        :raises ValueError: If IP version is not 4 or 6.
+        """
+        if version == 4:
+            return str(IPv4Address(random.randint(0, IPv4Address._ALL_ONES)))
+        elif version == 6:
+            return str(IPv6Address(random.randint(0, IPv6Address._ALL_ONES)))   
+        else:
+            raise ValueError("Invalid IP version (should be 4 or 6).")       
 
 
     @classmethod
@@ -111,17 +141,17 @@ class Packet:
             elif value_type == "ipv4":
                 # Field value is an IPv4 address
                 # Generate a random IPv4 address
-                new_value = str(IPv4Address(random.randint(0, IPv4Address._ALL_ONES)))
+                new_value = Packet.random_ip_address(version=4)
 
             elif value_type == "ipv6":
                 # Field value is an IPv6 address
                 # Generate a random IPv6 address
-                new_value = str(IPv6Address(random.randint(0, IPv6Address._ALL_ONES)))
+                new_value = Packet.random_ip_address(version=6)
             
             elif value_type == "mac":
                 # Field value is a MAC address
                 # Generate a random MAC address
-                new_value = ":".join(["%02x" % random.randint(0, 255) for _ in range(6)])
+                new_value = Packet.random_mac_address()
             
         # Set new value for field
         print(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
