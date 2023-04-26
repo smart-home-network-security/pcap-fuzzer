@@ -53,7 +53,7 @@ class CoAP(Packet):
         new_options = []
         for i in range(len(options)):
             if options[i][0] == "Uri-Path" or options[i][0] == "Uri-Query":
-                new_options.append((options[i][0], Packet.string_edit_char(options[i][1])))
+                new_options.append((options[i][0], Packet.bytes_edit_char(options[i][1])))
             else:
                 new_options.append(options[i])
         return new_options

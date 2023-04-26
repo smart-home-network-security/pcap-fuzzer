@@ -12,23 +12,38 @@ class Packet:
     """
 
     # List of all alphanumerical characters
-    ALPHANUM = list(bytes(string.ascii_letters + string.digits, "utf-8"))
+    ALPHANUM_CHARS = list(string.ascii_letters + string.digits)
+    ALPHANUM_BYTES = list(bytes(string.ascii_letters + string.digits, "utf-8"))
 
     # Modifiable fields, will be overridden by child classes
     fields = {}
 
 
     @staticmethod
-    def string_edit_char(s: str) -> bytes:
+    def string_edit_char(s: str) -> str:
         """
-        Randomly change one character in a string or a byte array.
+        Randomly change one character in a string.
 
-        :param s: String or byte array to be edited.
-        :return: Edited string or byte array.
+        :param s: String to be edited.
+        :return: Edited string.
         """
-        char = random.choice(Packet.ALPHANUM)
+        char = random.choice(Packet.ALPHANUM_CHARS)
         new_value = list(s)
         new_value[random.randint(0, len(new_value) - 1)] = char
+        return "".join(new_value)
+    
+
+    @staticmethod
+    def bytes_edit_char(s: bytes) -> bytes:
+        """
+        Randomly change one character in a byte array.
+
+        :param s: Byte array to be edited.
+        :return: Edited byte array.
+        """
+        byte = random.choice(Packet.ALPHANUM_BYTES)
+        new_value = list(s)
+        new_value[random.randint(0, len(new_value) - 1)] = byte
         return bytes(new_value)
 
 
@@ -109,11 +124,14 @@ class Packet:
         Update packet checksums, if needed.
         """
         if self.packet.haslayer("IP"):
-            del self.packet.getlayer("IP").len
-            del self.packet.getlayer("IP").chksum
-            if self.packet.getlayer(2).name == "UDP":
-                del self.packet.getlayer(2).len
-            del self.packet.getlayer(2).chksum
+            ip_layer = self.packet.getlayer("IP")
+            ip_layer.delfieldval("len")
+            ip_layer.delfieldval("chksum")
+            transport_layer = self.packet.getlayer(2)
+            if hasattr(transport_layer, "len"):
+                transport_layer.delfieldval("len")
+            if hasattr(transport_layer, "chksum"):
+                transport_layer.delfieldval("chksum")
             self.packet = scapy.Ether(self.packet.build())
 
 
@@ -136,7 +154,7 @@ class Packet:
                 values = value_type
                 new_value = old_value
                 # Randomly pick new value
-                new_value = bytes(random.choice(values), "utf-8")
+                new_value = random.choice(values)
 
             elif "int" in value_type:
                 # Field value is an integer

@@ -10,14 +10,14 @@ class HTTP(Packet):
     # Modifiable fields
     fields = {
         "Method": [
-            "GET",
-            "POST",
-            "PUT",
-            "DELETE",
-            "HEAD",
-            "OPTIONS",
-            "TRACE",
-            "CONNECT"
+            b"GET",
+            b"POST",
+            b"PUT",
+            b"DELETE",
+            b"HEAD",
+            b"OPTIONS",
+            b"TRACE",
+            b"CONNECT"
         ],
         "Path": "str"
     }

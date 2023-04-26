@@ -64,7 +64,7 @@ class DHCP(Packet):
             elif field == "client_id":
                 # Client ID is a byte array
                 # Randomly change one character
-                new_value = Packet.string_edit_char(old_value)
+                new_value = Packet.bytes_edit_char(old_value)
 
         # Set new value for field
         print(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
