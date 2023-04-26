@@ -19,6 +19,20 @@ class Packet:
 
 
     @staticmethod
+    def string_edit_char(s: str) -> bytes:
+        """
+        Randomly change one character in a string or a byte array.
+
+        :param s: String or byte array to be edited.
+        :return: Edited string or byte array.
+        """
+        char = random.choice(Packet.ALPHANUM)
+        new_value = list(s)
+        new_value[random.randint(0, len(new_value) - 1)] = char
+        return bytes(new_value)
+
+
+    @staticmethod
     def random_mac_address() -> str:
         """
         Generate a random MAC address.
@@ -88,6 +102,19 @@ class Packet:
         :return: Scapy Packet.
         """
         return self.packet
+    
+
+    def update_checksums(self) -> None:
+        """
+        Update packet checksums, if needed.
+        """
+        if self.packet.haslayer("IP"):
+            del self.packet.getlayer("IP").len
+            del self.packet.getlayer("IP").chksum
+            if self.packet.getlayer(2).name == "UDP":
+                del self.packet.getlayer(2).len
+            del self.packet.getlayer(2).chksum
+            self.packet = scapy.Ether(self.packet.build())
 
 
     def tweak(self) -> None:
@@ -126,12 +153,9 @@ class Packet:
                     new_value = random.randint(start, end)
 
             elif value_type == "str":
-                # Field value is a string
+                # Field value is a string or a byte array
                 # Randomly change one character
-                char = random.choice(Packet.ALPHANUM)
-                new_value = list(old_value)
-                new_value[random.randint(0, len(new_value) - 1)] = char
-                new_value = bytes(new_value)
+                new_value = Packet.string_edit_char(old_value)
 
             elif value_type == "port":
                 # Field value is an port number
@@ -158,10 +182,4 @@ class Packet:
         self.layer.setfieldval(field, new_value)
 
         # Update checksums, if needed
-        if self.packet.haslayer("IP"):
-            del self.packet.getlayer("IP").len
-            del self.packet.getlayer("IP").chksum
-            if self.packet.getlayer(2).name == "UDP":
-                del self.packet.getlayer(2).len
-            del self.packet.getlayer(2).chksum
-            self.packet = scapy.Ether(self.packet.build())
+        self.update_checksums()

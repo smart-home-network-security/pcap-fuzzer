@@ -47,7 +47,7 @@ class DHCP(Packet):
 
     def tweak(self) -> None:
         """
-        Randomly edit one packet field.
+        Randomly edit one DHCP option.
         """
         # Get field which will be modified
         field, value_type = random.choice(list(self.fields.items()))
@@ -93,9 +93,4 @@ class DHCP(Packet):
         self.set_dhcp_option(field, new_value)
 
         # Update checksums
-        del self.packet.getlayer(1).len
-        del self.packet.getlayer(1).chksum
-        if self.packet.getlayer(2).name == "UDP":
-            del self.packet.getlayer(2).len
-        del self.packet.getlayer(2).chksum
-        self.packet = scapy.Ether(self.packet.build())
+        self.update_checksums()

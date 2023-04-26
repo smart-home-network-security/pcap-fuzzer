@@ -5,7 +5,7 @@ Randomly edit packet fields in a PCAP file.
 import argparse
 import json
 import scapy.all as scapy
-from scapy.contrib import igmpv3
+from scapy.contrib import coap
 from packet.Packet import Packet
 
 
@@ -54,6 +54,8 @@ if __name__ == "__main__":
             continue
 
         # Testing stuff
+        layer = packet.lastlayer()
+        layer.show()
 
         # Edit packet, if possible
         try:
