@@ -17,4 +17,4 @@ jobs:
           pip3 install -r $GITHUB_WORKSPACE/requirements.txt
 
       - name: Run script
-        run: python3 $GITHUB_WORKSPACE/src/pcap-tweaker.py $GITHUB_WORKSPACE/traces/http-xiaomi-cloud.pcap
+        run: python3 $GITHUB_WORKSPACE/src/pcap-tweaker.py $GITHUB_WORKSPACE/traces/http.pcap
