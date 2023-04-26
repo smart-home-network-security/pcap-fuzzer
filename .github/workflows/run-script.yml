@@ -16,5 +16,5 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install -r $GITHUB_WORKSPACE/requirements.txt
 
-      - name: Run script
-        run: python3 $GITHUB_WORKSPACE/src/pcap-tweaker.py $GITHUB_WORKSPACE/traces/http.pcap
+      - name: Run script on all captures
+        run: $GITHUB_WORKSPACE/.ci_scripts/run-all-pcaps.sh
