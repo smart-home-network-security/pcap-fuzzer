@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple
 import random
 import scapy.all as scapy
@@ -44,9 +45,11 @@ class DHCP(Packet):
         self.layer.setfieldval("options", dhcp_options)
 
 
-    def tweak(self) -> None:
+    def tweak(self) -> dict:
         """
         Randomly edit one DHCP option.
+
+        :return: Dictionary containing tweak information.
         """
         # Get field which will be modified
         field = random.choice(self.fields)
@@ -67,8 +70,10 @@ class DHCP(Packet):
                 new_value = Packet.bytes_edit_char(old_value)
 
         # Set new value for field
-        print(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
         self.set_dhcp_option(field, new_value)
 
         # Update checksums
         self.update_checksums()
+
+        # Return value: dictionary containing tweak information
+        return self.get_dict_log(field, old_value, new_value)

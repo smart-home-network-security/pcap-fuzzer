@@ -1,3 +1,4 @@
+import logging
 import random
 import scapy.all as scapy
 from scapy.contrib import coap
@@ -43,25 +44,38 @@ class CoAP(Packet):
     
 
     @staticmethod
-    def edit_uri(options: list) -> list:
+    def edit_uri(options: list) -> dict:
         """
         Randomly edit one character in each part of the URI of a CoAP packet.
 
         :param options: List of CoAP options.
         :return: Edited list of CoAP options.
         """
-        new_options = []
+        result = {
+            "new_options": [],
+            "old_uri": b"",
+            "new_uri": b""
+        }
         for i in range(len(options)):
             if options[i][0] == "Uri-Path" or options[i][0] == "Uri-Query":
-                new_options.append((options[i][0], Packet.bytes_edit_char(options[i][1])))
+                new_value = Packet.bytes_edit_char(options[i][1])
+                result["new_options"].append((options[i][0], new_value))
+                prefix = b"/?" if options[i][0] == "Uri-Query" else b"/"
+                result["old_uri"] += prefix + options[i][1]
+                result["new_uri"] += prefix + new_value
             else:
-                new_options.append(options[i])
-        return new_options
+                result["new_options"].append(options[i])
+        return result
 
 
-    def tweak(self) -> None:
+    def tweak(self) -> dict:
         """
-        Randomly edit one field of the CoAP packet.
+        Randomly edit one field of the CoAP packet, among the following:
+            - type
+            - code
+            - uri
+
+        :return: Dictionary containing tweak information.
         """
         # Get field which will be modified
         field = random.choice(self.fields)
@@ -73,14 +87,17 @@ class CoAP(Packet):
                 new_value = CoAP.new_int_value(old_value, 0, 3)
             elif field == "code":
                 new_value = CoAP.new_int_value(old_value, 1, 4)
-            print(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
             self.layer.setfieldval(field, new_value)
         
         # Chosen field is the URI
         elif field == "uri":
-            options = CoAP.edit_uri(self.layer.getfieldval("options"))
-            print(f"Packet {self.id}: Randomly edit CoAP URI")
-            self.layer.setfieldval("options", CoAP.edit_uri(options))
+            result = CoAP.edit_uri(self.layer.getfieldval("options"))
+            old_value = result["old_uri"]
+            new_value = result["new_uri"]
+            self.layer.setfieldval("options", CoAP.edit_uri(result["new_options"]))
         
         # Update checksums
         self.update_checksums()
+
+        # Return value: dictionary containing tweak information
+        return self.get_dict_log(field, old_value, new_value)

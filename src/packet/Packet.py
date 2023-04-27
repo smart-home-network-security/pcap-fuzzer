@@ -1,5 +1,6 @@
 from __future__ import annotations
 import importlib
+import logging
 import string
 import re
 import random
@@ -134,10 +135,33 @@ class Packet:
                 transport_layer.delfieldval("chksum")
             self.packet = scapy.Ether(self.packet.build())
 
+        
+    def get_dict_log(self, field: str, old_value: str, new_value: str) -> dict:
+        """
+        Log packet field modification,
+        and return a dictionary containing tweak information.
 
-    def tweak(self) -> None:
+        :param field: Field name.
+        :param old_value: Old field value.
+        :param new_value: New field value.
+        :return: Dictionary containing tweak information.
+        """
+        logging.info(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
+        d = {
+            "id": self.id,
+            "protocol": self.name,
+            "field": field,
+            "old_value": old_value,
+            "new_value": new_value
+        }
+        return d
+
+
+    def tweak(self) -> dict:
         """
         Randomly edit one packet field.
+
+        :return: Dictionary containing tweak information.
         """
         # Get field which will be modified
         field, value_type = random.choice(list(self.fields.items()))
@@ -196,8 +220,10 @@ class Packet:
                 new_value = Packet.random_mac_address()
             
         # Set new value for field
-        print(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
         self.layer.setfieldval(field, new_value)
 
         # Update checksums, if needed
         self.update_checksums()
+
+        # Return value: dictionary containing tweak information
+        return self.get_dict_log(field, old_value, new_value)

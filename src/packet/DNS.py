@@ -1,3 +1,4 @@
+import logging
 import random
 import scapy.all as scapy
 from scapy.layers import dns
@@ -37,12 +38,14 @@ class DNS(Packet):
     ]
 
 
-    def tweak(self) -> None:
+    def tweak(self) -> dict:
         """
         Randomly edit one DNS field, among the following:
             - QR flag
             - Query type
             - Query name
+
+        :return: Dictionary containing tweak information.
         """
         # Get field which will be modified
         field = random.choice(self.fields)
@@ -55,7 +58,6 @@ class DNS(Packet):
             # Flip QR flag value
             old_value = self.layer.getfieldval("qr")
             new_value = int(not old_value)
-            print(f"Packet {self.id}: DNS.qr = {old_value} -> {new_value}")
             self.layer.setfieldval("qr", new_value)
         
         # Field is query type
@@ -65,7 +67,6 @@ class DNS(Packet):
             new_value = old_value
             while new_value == old_value:
                 new_value = random.choice(self.qtypes)
-            print(f"Packet {self.id}: DNS.qtype = {old_value} -> {new_value}")
             question_record.setfieldval("qtype", new_value)
         
         # Field is query name
@@ -75,10 +76,10 @@ class DNS(Packet):
             new_value = old_value
             while new_value == old_value:
                 new_value = Packet.bytes_edit_char(old_value)
-            print(f"Packet {self.id}: DNS.qname = {old_value} -> {new_value}")
             question_record.setfieldval("qname", new_value)
-        
-        #self.layer.show()
         
         # Update checksums
         self.update_checksums()
+
+        # Return value: dictionary containing tweak information
+        return self.get_dict_log(field, old_value, new_value)
