@@ -19,5 +19,5 @@ class HTTP(Packet):
             b"TRACE",
             b"CONNECT"
         ],
-        "Path": "str"
+        "Path": "bytes"
     }

@@ -36,6 +36,7 @@ class Packet:
         char = random.choice(Packet.ALPHANUM_CHARS)
         new_value = list(s)
         new_value[random.randint(0, len(new_value) - 1)] = char
+        print(new_value)
         return "".join(new_value)
     
 
@@ -203,9 +204,14 @@ class Packet:
                     new_value = random.randint(start, end)
 
             elif value_type == "str":
-                # Field value is a string or a byte array
+                # Field value is a string
                 # Randomly change one character
                 new_value = Packet.string_edit_char(old_value)
+            
+            elif value_type == "bytes":
+                # Field value is a byte array
+                # Randomly change one byte
+                new_value = Packet.bytes_edit_char(old_value)
 
             elif value_type == "port":
                 # Field value is an port number
