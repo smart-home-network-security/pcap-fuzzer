@@ -16,6 +16,11 @@ class Packet:
     ALPHANUM_CHARS = list(string.ascii_letters + string.digits)
     ALPHANUM_BYTES = list(bytes(string.ascii_letters + string.digits, "utf-8"))
 
+    # Protocol name correspondences
+    protocols = {
+        "DHCP": "BOOTP"
+    }
+
     # Modifiable fields, will be overridden by child classes
     fields = {}
 
@@ -92,6 +97,8 @@ class Packet:
             protocol = "IPv4"
         elif protocol == "IP" and packet.getfieldval("version") == 6:
             protocol = "IPv6"
+        else:
+            protocol = Packet.protocols.get(protocol, protocol)
         module = importlib.import_module(f"packet.{protocol}")
         cls = getattr(module, protocol)
         return cls(packet, id)
@@ -102,6 +109,7 @@ class Packet:
         Generic packet constructor.
 
         :param packet: Scapy Packet to be edited.
+        :param id: Packet integer identifier.
         """
         self.id = id
         self.packet = packet

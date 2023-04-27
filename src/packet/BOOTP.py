@@ -5,16 +5,30 @@ import scapy.all as scapy
 from scapy.layers import dhcp
 from packet.Packet import Packet
 
-class DHCP(Packet):
+class BOOTP(Packet):
+    """
+    Class for DHCP packets.
+    """
 
     # Class variables
-    name = "DHCP"
+    name = "BOOTP"
 
     # Modifiable fields
     fields = [
-        "message-type",
-        "client_id"
+        "chaddr",
+        "message-type"
     ]
+
+
+    def __init__(self, packet: scapy.Packet, id: int = 0) -> None:
+        """
+        BOOTP/DHCP packet constructor.
+
+        :param packet: Scapy Packet to be edited.
+        :param id: Packet integer identifier.
+        """
+        super().__init__(packet, id)
+        self.dhcp_options = packet.getlayer("DHCP options")
 
 
     def get_dhcp_option(self, option_name) -> Tuple[str, any]:
@@ -24,7 +38,7 @@ class DHCP(Packet):
         :param option_name: Name of the DHCP option to retrieve.
         :return: DHCP option, as a tuple (name, value).
         """
-        dhcp_options = self.layer.getfieldval("options")
+        dhcp_options = self.dhcp_options.getfieldval("options")
         for option in dhcp_options:
             if option[0] == option_name:
                 return option
@@ -37,40 +51,38 @@ class DHCP(Packet):
         :param option_name: Name of the DHCP option to set.
         :param option_value: Value of the DHCP option to set.
         """
-        dhcp_options = self.layer.getfieldval("options")
+        dhcp_options = self.dhcp_options.getfieldval("options")
         for i in range(len(dhcp_options)):
             if dhcp_options[i][0] == option_name:
                 dhcp_options[i] = option_name, option_value
                 break
-        self.layer.setfieldval("options", dhcp_options)
+        self.dhcp_options.setfieldval("options", dhcp_options)
 
 
     def tweak(self) -> dict:
         """
-        Randomly edit one DHCP option.
+        Randomly edit a BOOTP/DHCP field, among the following:
+            - chaddr (client hardware address)
+            - message-type (DHCP message type)
 
         :return: Dictionary containing tweak information.
         """
         # Get field which will be modified
         field = random.choice(self.fields)
-        # Store old value of field
-        old_value = self.get_dhcp_option(field)[1]
 
-        # Modify field value until it is different from old value
-        new_value = old_value
-        while new_value == old_value:
+        if field == "chaddr":
+            old_value = self.layer.getfieldval("chaddr")  # Store old value of field
+            new_value = Packet.bytes_edit_char(old_value[:6]) + old_value[6:]  # Randomly change one byte in the MAC address
+            self.layer.setfieldval("chaddr", new_value)  # Set new value for field
 
-            if field == "message-type":
+        elif field == "message-type":
+            old_value = self.get_dhcp_option(field)[1]  # Store old value of field
+            # Modify field value until it is different from old value
+            new_value = old_value
+            while new_value == old_value:
                 # Message type is an integer between 1 and 8
                 new_value = random.randint(1, 8)
-
-            elif field == "client_id":
-                # Client ID is a byte array
-                # Randomly change one character
-                new_value = Packet.bytes_edit_char(old_value)
-
-        # Set new value for field
-        self.set_dhcp_option(field, new_value)
+            self.set_dhcp_option(field, new_value)  # Set new value for field
 
         # Update checksums
         self.update_checksums()
