@@ -94,7 +94,8 @@ class CoAP(Packet):
             result = CoAP.edit_uri(self.layer.getfieldval("options"))
             old_value = result["old_uri"]
             new_value = result["new_uri"]
-            self.layer.setfieldval("options", CoAP.edit_uri(result["new_options"]))
+            self.layer.setfieldval("options", result["new_options"])
+            print(self.layer.getfieldval("options"))
         
         # Update checksums
         self.update_checksums()

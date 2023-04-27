@@ -4,6 +4,7 @@ Randomly edit packet fields in a PCAP file.
 
 import os
 import argparse
+import random
 import logging
 import csv
 import scapy.all as scapy
@@ -31,6 +32,9 @@ if __name__ == "__main__":
     )
     # Positional arguments: input PCAP file
     parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP files.")
+    # Optional flag: -d / --dry-run
+    parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: do not write output PCAP file.")
+    # Parse arguments
     args = parser.parse_args()
 
     
@@ -54,12 +58,11 @@ if __name__ == "__main__":
             writer.writeheader()
 
             # Loop on packets
-            i = 0
+            i = 1
             for packet in packets:
 
                 # Choose randomly if we edit this packet
-                #if random.randint(0, 1) != 0:
-                if i != 0:
+                if random.randint(0, 1) != 0:
                     # Packet won't be edited
                     # Go to next packet
                     new_packets.append(packet)
@@ -79,5 +82,8 @@ if __name__ == "__main__":
 
         # Write output PCAP file
         output_pcap = input_pcap.replace(".pcap", ".edit.pcap")
-        #scapy.wrpcap(output_pcap, new_packets)
-        logging.info(f"Wrote output PCAP file: {output_pcap}")
+        if args.dry_run:
+            logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
+        else:
+            scapy.wrpcap(output_pcap, new_packets)
+            logging.info(f"Wrote output PCAP file: {output_pcap}")
