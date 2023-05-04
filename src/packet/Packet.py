@@ -155,9 +155,11 @@ class Packet:
         :param new_value: New field value.
         :return: Dictionary containing tweak information.
         """
-        logging.info(f"Packet {self.id}: {self.name}.{field} = {old_value} -> {new_value}")
+        timestamp = self.packet.time
+        logging.info(f"Packet {self.id}, timestamp {timestamp}: {self.name}.{field} = {old_value} -> {new_value}")
         d = {
             "id": self.id,
+            "timestamp": timestamp,
             "protocol": self.name,
             "field": field,
             "old_value": old_value,

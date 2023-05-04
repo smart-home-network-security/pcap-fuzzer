@@ -53,7 +53,7 @@ if __name__ == "__main__":
         csv_log = input_pcap.replace(".pcap", ".edit.csv")
         csv_log = os.path.join(csv_dir, os.path.basename(csv_log))
         with open(csv_log, "w") as csv_file:
-            field_names = ["id", "protocol", "field", "old_value", "new_value"]
+            field_names = ["id", "timestamp", "protocol", "field", "old_value", "new_value"]
             writer = csv.DictWriter(csv_file, fieldnames=field_names)
             writer.writeheader()
 
@@ -81,7 +81,10 @@ if __name__ == "__main__":
                     i += 1
 
         # Write output PCAP file
-        output_pcap = input_pcap.replace(".pcap", ".edit.pcap")
+        output_dir = os.path.join(os.path.dirname(input_pcap), "edited")
+        os.makedirs(output_dir, exist_ok=True)
+        output_pcap = os.path.basename(input_pcap).replace(".pcap", ".edit.pcap")
+        output_pcap = os.path.join(output_dir, output_pcap)
         if args.dry_run:
             logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
         else:
