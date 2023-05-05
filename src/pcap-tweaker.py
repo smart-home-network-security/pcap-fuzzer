@@ -34,6 +34,8 @@ if __name__ == "__main__":
     parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP files.")
     # Optional flag: -d / --dry-run
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: do not write output PCAP file.")
+    # Optional flag: -r / --random-range
+    parser.add_argument("-r", "--random-range", type=int, default=1, help="Upper bound for random range.")
     # Parse arguments
     args = parser.parse_args()
 
@@ -62,7 +64,7 @@ if __name__ == "__main__":
             for packet in packets:
 
                 # Choose randomly if we edit this packet
-                if random.randint(0, 1) != 0:
+                if random.randint(0, args.random_range) != 0:
                     # Packet won't be edited
                     # Go to next packet
                     new_packets.append(packet)
