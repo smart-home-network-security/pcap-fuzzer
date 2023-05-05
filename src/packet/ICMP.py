@@ -8,5 +8,12 @@ class ICMP(Packet):
 
     # Modifiable fields
     fields = {
-        "type": "int[0,255]"
+        "type": [
+            0,   # Echo Reply
+            3,   # Destination Unreachable
+            5,   # Redirect
+            8,   # Echo Request
+            13,  # Timestamp
+            14   # Timestamp Reply
+        ]  
     }

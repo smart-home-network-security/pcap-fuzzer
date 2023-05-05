@@ -75,14 +75,15 @@ if __name__ == "__main__":
 
                 # Edit packet, if possible
                 try:
-                    packet = Packet.init_packet(packet, i)
-                    d = packet.tweak()
-                    new_packets.append(packet.get_packet())
-                    if d is not None:
-                        writer.writerow(d)
+                    my_packet = Packet.init_packet(packet, i)
                 except ValueError:
                     # No supported protocol found in packet, skip it
                     new_packets.append(packet)
+                else:
+                    d = my_packet.tweak()
+                    new_packets.append(my_packet.get_packet())
+                    if d is not None:
+                        writer.writerow(d)
                 finally:
                     i += 1
 

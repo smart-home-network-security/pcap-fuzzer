@@ -36,7 +36,6 @@ class Packet:
         char = random.choice(Packet.ALPHANUM_CHARS)
         new_value = list(s)
         new_value[random.randint(0, len(new_value) - 1)] = char
-        print(new_value)
         return "".join(new_value)
     
 
