@@ -1,2 +1,68 @@
 # pcap-tweaker
-Randomly edit packet fields in a PCAP file.
+This program randomly edits packets from a PCAP file,
+one field per edited packet.
+
+The edited field will be chosen at random,
+starting from the highest layer, and going down until it finds a supported protocol layer.
+
+Example: a DNS packet will have one of its DNS fields edited,
+and not one of the UDP or IP fields.
+
+
+## Dependencies
+
+* [Scapy](https://scapy.net/)
+  * `pip install scapy`
+
+Install all with:
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+```bash
+python3 pcap-tweaker.py [-h] [-d] [-r RANDOM_RANGE] pcap [pcap ...]
+```
+
+The program produces new PCAP file with the same name as the input files,
+but with the suffix `.edit`.
+The output files will be placed in a directory called `edited`,
+in the same directory as the input files.
+It will be created if it doesn't exist.
+
+The program also produces CSV log files,
+indicating which fields were edited for each packet.
+The log files will be placed in a directory called `logs`,
+in the same directory as the input files.
+It will be created if it doesn't exist.
+
+### Positional arguments
+
+* `pcap`: PCAP file(s) to edit
+
+### Optional arguments
+
+* `-h`, `--help`: show help message and exit
+* `-d`, `--dry-run`: don't write the output PCAP file (but still write the CSV log file)
+* `-r`, `--random-range`: upper bound for the random range, which will select for each packet if it will be edited or not. In practice, each packet will be edited with a probability of `1/(r+1)`. Default: `0` (edit all packets).
+
+
+## Supported protocols
+
+* Datalink Layer (2)
+  * ARP
+* Network Layer (3)
+  * IPv4
+  * IPv6
+* Transport Layer (4)
+  * TCP
+  * UDP
+  * ICMP
+  * IGMP(v2 and v3)
+* Application Layer (7)
+  * HTTP
+  * DNS
+  * DHCP
+  * SSDP
+  * CoAP
