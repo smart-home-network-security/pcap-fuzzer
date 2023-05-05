@@ -16,7 +16,7 @@ class IGMP(Packet):
             0x11,  # Membership Query
             0x12,  # Version 1 Membership Report
             0x16,  # Version 2 Membership Report
-            0x17,  # Leave Group
+            0x17   # Leave Group
         ],
         "gaddr": "ipv4"
     }

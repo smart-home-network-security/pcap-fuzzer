@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Tuple
 import importlib
 import logging
 import string
@@ -77,7 +78,23 @@ class Packet:
         elif version == 6:
             return str(IPv6Address(random.randint(0, IPv6Address._ALL_ONES)))   
         else:
-            raise ValueError("Invalid IP version (should be 4 or 6).")       
+            raise ValueError("Invalid IP version (should be 4 or 6).")   
+
+
+    @staticmethod
+    def get_last_layer_index(packet: scapy.Packet) -> int:
+        """
+        Get the index of the last layer of a Scapy packet.
+
+        :param packet: Scapy Packet.
+        :return: index of the last packet layer.
+        """
+        i = 0
+        layer = packet.getlayer(i)
+        while layer is not None:
+            i += 1
+            layer = packet.getlayer(i)
+        return i - 1
 
 
     @classmethod
@@ -91,8 +108,8 @@ class Packet:
                  or generic Packet if protocol is not supported.
         """
         # Try creating specific packet if possible
-        layers = packet.layers()
-        for i in range(len(layers)-1, -1, -1):
+        last_layer_index = Packet.get_last_layer_index(packet)
+        for i in range(last_layer_index, -1, -1):
             layer = packet.getlayer(i)
             try:
                 protocol = layer.name.replace(" ", "_")
