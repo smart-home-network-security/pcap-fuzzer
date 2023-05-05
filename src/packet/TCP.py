@@ -1,7 +1,7 @@
 import scapy.all as scapy
-from packet.Packet import Packet
+from packet.Transport import Transport
 
-class TCP(Packet):
+class TCP(Transport):
 
     # Class variables
     name = "TCP"
@@ -11,3 +11,11 @@ class TCP(Packet):
         "sport": "port",
         "dport": "port"
     }
+
+    # Well-known ports
+    ports = [
+        80,    # HTTP
+        443,   # HTTPS
+        8080,  # HTTP alternate
+        9999   # TP-Link
+    ]

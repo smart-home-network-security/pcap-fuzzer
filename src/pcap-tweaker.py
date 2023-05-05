@@ -18,7 +18,6 @@ if __name__ == "__main__":
     # Script-related variables
     script_name = os.path.basename(__file__)
     script_path = os.path.dirname(os.path.abspath(__file__))
-    base_path = os.path.dirname(script_path)
 
     ### LOGGING CONFIGURATION ###
     logging.basicConfig(level=logging.INFO)
@@ -39,21 +38,24 @@ if __name__ == "__main__":
     # Parse arguments
     args = parser.parse_args()
 
-    
+
     ### MAIN PROGRAM ###
 
     # Loop on given input PCAP files
     for input_pcap in args.input_pcaps:
+        # Useful paths
+        input_dir = os.path.dirname(input_pcap)
+
         # Read input PCAP file
         packets = scapy.rdpcap(input_pcap)
         logging.info(f"Read input PCAP file: {input_pcap}")
         new_packets = []
 
         # Open log CSV file
-        csv_dir = os.path.join(base_path, "csv")
+        csv_dir = os.path.join(input_dir, "csv")
         os.makedirs(csv_dir, exist_ok=True)
-        csv_log = input_pcap.replace(".pcap", ".edit.csv")
-        csv_log = os.path.join(csv_dir, os.path.basename(csv_log))
+        csv_log = os.path.basename(input_pcap).replace(".pcap", ".edit.csv")
+        csv_log = os.path.join(csv_dir, csv_log)
         with open(csv_log, "w") as csv_file:
             field_names = ["id", "timestamp", "protocol", "field", "old_value", "new_value"]
             writer = csv.DictWriter(csv_file, fieldnames=field_names)
@@ -76,7 +78,8 @@ if __name__ == "__main__":
                     packet = Packet.init_packet(packet.lastlayer().name, packet, i)
                     d = packet.tweak()
                     new_packets.append(packet.get_packet())
-                    writer.writerow(d)
+                    if d is not None:
+                        writer.writerow(d)
                 except ModuleNotFoundError:
                     new_packets.append(packet)
                 finally:

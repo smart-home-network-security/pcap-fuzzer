@@ -172,7 +172,8 @@ class Packet:
         """
         Randomly edit one packet field.
 
-        :return: Dictionary containing tweak information.
+        :return: Dictionary containing tweak information,
+                 or None if no tweak was performed.
         """
         # Get field which will be modified
         field, value_type = random.choice(list(self.fields.items()))
