@@ -2,10 +2,10 @@ import scapy.all as scapy
 from scapy.layers import http
 from packet.Packet import Packet
 
-class HTTP(Packet):
+class HTTP_Request(Packet):
 
     # Class variables
-    name = "HTTP"
+    name = "HTTP Request"
 
     # Modifiable fields
     fields = {

@@ -82,27 +82,35 @@ class Packet:
 
 
     @classmethod
-    def init_packet(c, protocol: str, packet: scapy.Packet, id: int = 0) -> Packet:
+    def init_packet(c, packet: scapy.Packet, id: int = 0) -> Packet:
         """
         Factory method to create a packet of a given protocol.
 
-        :param protocol: Packet highest layer protocol.
         :param packet: Scapy Packet to be edited.
         :param id: Packet integer identifier.
         :return: Packet of given protocol,
                  or generic Packet if protocol is not supported.
         """
         # Try creating specific packet if possible
-        protocol = protocol.split()[0]
-        if protocol == "IP" and packet.getfieldval("version") == 4:
-            protocol = "IPv4"
-        elif protocol == "IP" and packet.getfieldval("version") == 6:
-            protocol = "IPv6"
-        else:
-            protocol = Packet.protocols.get(protocol, protocol)
-        module = importlib.import_module(f"packet.{protocol}")
-        cls = getattr(module, protocol)
-        return cls(packet, id)
+        layers = packet.layers()
+        for i in range(len(layers)-1, -1, -1):
+            layer = packet.getlayer(i)
+            try:
+                protocol = layer.name.replace(" ", "_")
+                if protocol == "IP" and packet.getfieldval("version") == 4:
+                    protocol = "IPv4"
+                elif protocol == "IP" and packet.getfieldval("version") == 6:
+                    protocol = "IPv6"
+                else:
+                    protocol = Packet.protocols.get(protocol, protocol)
+                module = importlib.import_module(f"packet.{protocol}")
+                cls = getattr(module, protocol)
+                return cls(packet, id)
+            except ModuleNotFoundError:
+                # Layer protocol not supported
+                continue
+        # No supported protocol found, raise ValueError
+        raise ValueError(f"No supported protocol found for packet: {packet.summary()}")
 
 
     def __init__(self, packet: scapy.Packet, id: int = 0) -> None:

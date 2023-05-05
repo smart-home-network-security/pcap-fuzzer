@@ -34,7 +34,7 @@ if __name__ == "__main__":
     # Optional flag: -d / --dry-run
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: do not write output PCAP file.")
     # Optional flag: -r / --random-range
-    parser.add_argument("-r", "--random-range", type=int, default=1, help="Upper bound for random range.")
+    parser.add_argument("-r", "--random-range", type=int, default=0, help="Upper bound for random range.")
     # Parse arguments
     args = parser.parse_args()
 
@@ -75,12 +75,13 @@ if __name__ == "__main__":
 
                 # Edit packet, if possible
                 try:
-                    packet = Packet.init_packet(packet.lastlayer().name, packet, i)
+                    packet = Packet.init_packet(packet, i)
                     d = packet.tweak()
                     new_packets.append(packet.get_packet())
                     if d is not None:
                         writer.writerow(d)
-                except ModuleNotFoundError:
+                except ValueError:
+                    # No supported protocol found in packet, skip it
                     new_packets.append(packet)
                 finally:
                     i += 1
