@@ -166,7 +166,7 @@ class Packet:
                 transport_layer.delfieldval("len")
             if hasattr(transport_layer, "chksum"):
                 transport_layer.delfieldval("chksum")
-            self.packet = scapy.Ether(self.packet.build())
+            self.packet.show2(dump=True)
 
         
     def get_dict_log(self, field: str, old_value: str, new_value: str) -> dict:
