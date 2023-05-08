@@ -7,6 +7,7 @@ import argparse
 import random
 import logging
 import csv
+from copy import deepcopy
 import scapy.all as scapy
 from scapy.layers import dhcp, dns, http
 from scapy.contrib import coap, igmp, igmpv3
@@ -35,6 +36,8 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: do not write output PCAP file.")
     # Optional flag: -r / --random-range
     parser.add_argument("-r", "--random-range", type=int, default=0, help="Upper bound for random range.")
+    # Optional flag: -n
+    parser.add_argument("-n", "--packet-number", type=int, help="Index of the packet to edit.")
     # Parse arguments
     args = parser.parse_args()
 
@@ -49,7 +52,6 @@ if __name__ == "__main__":
         # Read input PCAP file
         packets = scapy.rdpcap(input_pcap)
         logging.info(f"Read input PCAP file: {input_pcap}")
-        new_packets = []
 
         # Open log CSV file
         csv_dir = os.path.join(input_dir, "csv")
@@ -61,31 +63,43 @@ if __name__ == "__main__":
             writer = csv.DictWriter(csv_file, fieldnames=field_names)
             writer.writeheader()
 
-            # Loop on packets
-            i = 1
-            for packet in packets:
-
-                # Choose randomly if we edit this packet
-                if random.randint(0, args.random_range) != 0:
-                    # Packet won't be edited
-                    # Go to next packet
-                    new_packets.append(packet)
-                    i += 1
-                    continue
-
-                # Edit packet, if possible
+            if args.packet_number is not None:
+                # Edit one specific packet
+                packet = packets[args.packet_number - 1]  # -1 because packet numbers start at 1
                 try:
-                    my_packet = Packet.init_packet(packet, i)
+                    my_packet = Packet.init_packet(packet, args.packet_number)
                 except ValueError:
                     # No supported protocol found in packet, skip it
-                    new_packets.append(packet)
+                    pass
                 else:
                     d = my_packet.tweak()
-                    new_packets.append(my_packet.get_packet())
                     if d is not None:
                         writer.writerow(d)
-                finally:
-                    i += 1
+
+            else:
+                # Randomly edit packets
+                i = 1
+                for packet in packets:
+
+                    # Choose randomly if we edit this packet
+                    if random.randint(0, args.random_range) != 0:
+                        # Packet won't be edited
+                        # Go to next packet
+                        i += 1
+                        continue
+
+                    # Edit packet, if possible
+                    try:
+                        my_packet = Packet.init_packet(packet, i)
+                    except ValueError:
+                        # No supported protocol found in packet, skip it
+                        pass
+                    else:
+                        d = my_packet.tweak()
+                        if d is not None:
+                            writer.writerow(d)
+                    finally:
+                        i += 1
 
         # Write output PCAP file
         output_dir = os.path.join(os.path.dirname(input_pcap), "edited")
@@ -95,5 +109,5 @@ if __name__ == "__main__":
         if args.dry_run:
             logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
         else:
-            scapy.wrpcap(output_pcap, new_packets)
+            scapy.wrpcap(output_pcap, packets)
             logging.info(f"Wrote output PCAP file: {output_pcap}")
