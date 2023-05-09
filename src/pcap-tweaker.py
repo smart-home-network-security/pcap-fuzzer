@@ -36,8 +36,8 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: do not write output PCAP file.")
     # Optional flag: -r / --random-range
     parser.add_argument("-r", "--random-range", type=int, default=0, help="Upper bound for random range.")
-    # Optional flag: -n
-    parser.add_argument("-n", "--packet-number", type=int, help="Index of the packet to edit.")
+    # Optional flag: -n / --packet-number
+    parser.add_argument("-n", "--packet-number", type=int, action="append", help="Index of the packet to edit, starting form 1. Can be specifed multiple times.")
     # Parse arguments
     args = parser.parse_args()
 
@@ -64,17 +64,18 @@ if __name__ == "__main__":
             writer.writeheader()
 
             if args.packet_number is not None:
-                # Edit one specific packet
-                packet = packets[args.packet_number - 1]  # -1 because packet numbers start at 1
-                try:
-                    my_packet = Packet.init_packet(packet, args.packet_number)
-                except ValueError:
-                    # No supported protocol found in packet, skip it
-                    pass
-                else:
-                    d = my_packet.tweak()
-                    if d is not None:
-                        writer.writerow(d)
+                # Edit specific packets
+                for i in args.packet_number:
+                    packet = packets[i - 1]  # -1 because packet numbers start at 1
+                    try:
+                        my_packet = Packet.init_packet(packet, i)
+                    except ValueError:
+                        # No supported protocol found in packet, skip it
+                        pass
+                    else:
+                        d = my_packet.tweak()
+                        if d is not None:
+                            writer.writerow(d)
 
             else:
                 # Randomly edit packets
