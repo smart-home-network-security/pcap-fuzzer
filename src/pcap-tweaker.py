@@ -7,7 +7,6 @@ import argparse
 import random
 import logging
 import csv
-from copy import deepcopy
 import scapy.all as scapy
 from scapy.layers import dhcp, dns, http
 from scapy.contrib import coap, igmp, igmpv3
