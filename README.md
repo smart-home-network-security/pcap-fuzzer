@@ -22,7 +22,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python3 pcap-tweaker.py [-h] [-d] [-r RANDOM_RANGE] [-n PACKET_NUMBER] pcap [pcap ...]
+python3 pcap_tweaker.py [-h] [-d] [-r RANDOM_RANGE] [-n PACKET_NUMBER] pcap [pcap ...]
 ```
 
 The program produces new PCAP file with the same name as the input files,
