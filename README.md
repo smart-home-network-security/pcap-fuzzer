@@ -45,7 +45,7 @@ It will be created if it doesn't exist.
 
 * `-h`, `--help`: show help message and exit
 * `-d`, `--dry-run`: don't write the output PCAP file (but still write the CSV log file)
-* `-r`, `--random-range`: upper bound for the random range, which will select for each packet if it will be edited or not. In practice, each packet will be edited with a probability of `1/(r+1)`. Default: `0` (edit all packets).
+* `-r`, `--random-range`: upper bound for the random range, which will select for each packet if it will be edited or not. In practice, each packet will be edited with a probability of `1/r`. Must be a strictly positive integer. Default: `1` (edit all packets).
 * `-n`, `--packet-number`: index of the packet to edit, starting from 1. Can be specified multiple times. If this is used, only the specified packets will be edited, and no random editing will be performed.
 
 

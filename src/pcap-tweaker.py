@@ -13,6 +13,24 @@ from scapy.contrib import coap, igmp, igmpv3
 from packet.Packet import Packet
 
 
+def strictly_positive_int(value: any) -> int:
+    """
+    Custom argparse type for a strictly positive integer value.
+    
+    :param value: argument value to check
+    :return: argument as integer if it is strictly positive
+    :raises argparse.ArgumentTypeError: if argument does not represent a strictly positive integer
+    """
+    try:
+        ivalue = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"{value} does not represent an integer.")
+    else:
+        if ivalue < 1:
+            raise argparse.ArgumentTypeError(f"{value} does not represent a strictly positive integer.")
+        return ivalue
+
+
 if __name__ == "__main__":
 
     # Script-related variables
@@ -32,11 +50,14 @@ if __name__ == "__main__":
     # Positional arguments: input PCAP file
     parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP files.")
     # Optional flag: -d / --dry-run
-    parser.add_argument("-d", "--dry-run", action="store_true", help="Dry run: do not write output PCAP file.")
+    parser.add_argument("-d", "--dry-run", action="store_true",
+                        help="Dry run: do not write output PCAP file.")
     # Optional flag: -r / --random-range
-    parser.add_argument("-r", "--random-range", type=int, default=0, help="Upper bound for random range.")
+    parser.add_argument("-r", "--random-range", type=strictly_positive_int, default=1,
+                        help="Upper bound for random range (not included). Must be a strictly positive integer. Default: 1 (edit each packet).")
     # Optional flag: -n / --packet-number
-    parser.add_argument("-n", "--packet-number", type=int, action="append", help="Index of the packet to edit, starting form 1. Can be specifed multiple times.")
+    parser.add_argument("-n", "--packet-number", type=int, action="append",
+                        help="Index of the packet to edit, starting form 1. Can be specifed multiple times.")
     # Parse arguments
     args = parser.parse_args()
 
@@ -82,7 +103,7 @@ if __name__ == "__main__":
                 for packet in packets:
 
                     # Choose randomly if we edit this packet
-                    if random.randint(0, args.random_range) != 0:
+                    if random.randrange(0, args.random_range) != 0:
                         # Packet won't be edited
                         # Go to next packet
                         i += 1
