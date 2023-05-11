@@ -31,11 +31,91 @@ def strictly_positive_int(value: any) -> int:
         return ivalue
 
 
+def tweak_pcaps(pcaps: list, dry_run: bool, packet_numbers: list, random_range: int = 1) -> None:
+    """
+    Main functionality of the program:
+    (Randomly) edit packet fields in a (list of) PCAP file(s).
+
+    :param pcaps: list of input PCAP files
+    :param dry_run: if True, do not write output PCAP file
+    :param packet_numbers: list of packet numbers to edit (starting from 1)
+    :param random_range: upper bound for random range (not included)
+    """
+    
+    # Loop on given input PCAP files
+    for input_pcap in pcaps:
+        # PCAP file directory
+        input_dir = os.path.dirname(input_pcap)
+
+        # Read input PCAP file
+        packets = scapy.rdpcap(input_pcap)
+        logging.info(f"Read input PCAP file: {input_pcap}")
+
+        # Open log CSV file
+        csv_dir = os.path.join(input_dir, "csv")
+        os.makedirs(csv_dir, exist_ok=True)
+        csv_log = os.path.basename(input_pcap).replace(".pcap", ".edit.csv")
+        csv_log = os.path.join(csv_dir, csv_log)
+        with open(csv_log, "w") as csv_file:
+            field_names = ["id", "timestamp", "protocol", "field", "old_value", "new_value"]
+            writer = csv.DictWriter(csv_file, fieldnames=field_names)
+            writer.writeheader()
+
+            if packet_numbers is not None:
+                # Edit specific packets
+                for i in packet_numbers:
+                    packet = packets[i - 1]  # -1 because packet numbers start at 1
+                    try:
+                        my_packet = Packet.init_packet(packet, i)
+                    except ValueError:
+                        # No supported protocol found in packet, skip it
+                        pass
+                    else:
+                        d = my_packet.tweak()
+                        if d is not None:
+                            writer.writerow(d)
+
+            else:
+                # Randomly edit packets
+                i = 1
+                for packet in packets:
+
+                    # Choose randomly if we edit this packet
+                    if random.randrange(0, random_range) != 0:
+                        # Packet won't be edited
+                        # Go to next packet
+                        i += 1
+                        continue
+
+                    # Edit packet, if possible
+                    try:
+                        my_packet = Packet.init_packet(packet, i)
+                    except ValueError:
+                        # No supported protocol found in packet, skip it
+                        pass
+                    else:
+                        d = my_packet.tweak()
+                        if d is not None:
+                            writer.writerow(d)
+                    finally:
+                        i += 1
+
+        # Write output PCAP file
+        output_dir = os.path.join(os.path.dirname(input_pcap), "edited")
+        os.makedirs(output_dir, exist_ok=True)
+        output_pcap = os.path.basename(input_pcap).replace(".pcap", ".edit.pcap")
+        output_pcap = os.path.join(output_dir, output_pcap)
+        if dry_run:
+            logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
+        else:
+            scapy.wrpcap(output_pcap, packets)
+            logging.info(f"Wrote output PCAP file: {output_pcap}")
+
+
 if __name__ == "__main__":
 
-    # Script-related variables
+    # This script's name
     script_name = os.path.basename(__file__)
-    script_path = os.path.dirname(os.path.abspath(__file__))
 
     ### LOGGING CONFIGURATION ###
     logging.basicConfig(level=logging.INFO)
@@ -63,72 +143,4 @@ if __name__ == "__main__":
 
 
     ### MAIN PROGRAM ###
-
-    # Loop on given input PCAP files
-    for input_pcap in args.input_pcaps:
-        # Useful paths
-        input_dir = os.path.dirname(input_pcap)
-
-        # Read input PCAP file
-        packets = scapy.rdpcap(input_pcap)
-        logging.info(f"Read input PCAP file: {input_pcap}")
-
-        # Open log CSV file
-        csv_dir = os.path.join(input_dir, "csv")
-        os.makedirs(csv_dir, exist_ok=True)
-        csv_log = os.path.basename(input_pcap).replace(".pcap", ".edit.csv")
-        csv_log = os.path.join(csv_dir, csv_log)
-        with open(csv_log, "w") as csv_file:
-            field_names = ["id", "timestamp", "protocol", "field", "old_value", "new_value"]
-            writer = csv.DictWriter(csv_file, fieldnames=field_names)
-            writer.writeheader()
-
-            if args.packet_number is not None:
-                # Edit specific packets
-                for i in args.packet_number:
-                    packet = packets[i - 1]  # -1 because packet numbers start at 1
-                    try:
-                        my_packet = Packet.init_packet(packet, i)
-                    except ValueError:
-                        # No supported protocol found in packet, skip it
-                        pass
-                    else:
-                        d = my_packet.tweak()
-                        if d is not None:
-                            writer.writerow(d)
-
-            else:
-                # Randomly edit packets
-                i = 1
-                for packet in packets:
-
-                    # Choose randomly if we edit this packet
-                    if random.randrange(0, args.random_range) != 0:
-                        # Packet won't be edited
-                        # Go to next packet
-                        i += 1
-                        continue
-
-                    # Edit packet, if possible
-                    try:
-                        my_packet = Packet.init_packet(packet, i)
-                    except ValueError:
-                        # No supported protocol found in packet, skip it
-                        pass
-                    else:
-                        d = my_packet.tweak()
-                        if d is not None:
-                            writer.writerow(d)
-                    finally:
-                        i += 1
-
-        # Write output PCAP file
-        output_dir = os.path.join(os.path.dirname(input_pcap), "edited")
-        os.makedirs(output_dir, exist_ok=True)
-        output_pcap = os.path.basename(input_pcap).replace(".pcap", ".edit.pcap")
-        output_pcap = os.path.join(output_dir, output_pcap)
-        if args.dry_run:
-            logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
-        else:
-            scapy.wrpcap(output_pcap, packets)
-            logging.info(f"Wrote output PCAP file: {output_pcap}")
+    tweak_pcaps(args.input_pcaps, args.dry_run, args.packet_number, args.random_range)    
