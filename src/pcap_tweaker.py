@@ -31,15 +31,15 @@ def strictly_positive_int(value: any) -> int:
         return ivalue
 
 
-def tweak_pcaps(pcaps: list, dry_run: bool, packet_numbers: list, random_range: int = 1) -> None:
+def tweak_pcaps(pcaps: list, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
     """
     Main functionality of the program:
     (Randomly) edit packet fields in a (list of) PCAP file(s).
 
     :param pcaps: list of input PCAP files
-    :param dry_run: if True, do not write output PCAP file
-    :param packet_numbers: list of packet numbers to edit (starting from 1)
     :param random_range: upper bound for random range (not included)
+    :param packet_numbers: list of packet numbers to edit (starting from 1)
+    :param dry_run: if True, do not write output PCAP file
     """
     
     # Loop on given input PCAP files
@@ -129,18 +129,23 @@ if __name__ == "__main__":
     )
     # Positional arguments: input PCAP file
     parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP files.")
-    # Optional flag: -d / --dry-run
-    parser.add_argument("-d", "--dry-run", action="store_true",
-                        help="Dry run: do not write output PCAP file.")
     # Optional flag: -r / --random-range
     parser.add_argument("-r", "--random-range", type=strictly_positive_int, default=1,
                         help="Upper bound for random range (not included). Must be a strictly positive integer. Default: 1 (edit each packet).")
     # Optional flag: -n / --packet-number
     parser.add_argument("-n", "--packet-number", type=int, action="append",
                         help="Index of the packet to edit, starting form 1. Can be specifed multiple times.")
+    # Optional flag: -d / --dry-run
+    parser.add_argument("-d", "--dry-run", action="store_true",
+                        help="Dry run: do not write output PCAP file.")
     # Parse arguments
     args = parser.parse_args()
 
 
     ### MAIN PROGRAM ###
-    tweak_pcaps(args.input_pcaps, args.dry_run, args.packet_number, args.random_range)    
+    tweak_pcaps(
+        pcaps=args.input_pcaps,
+        random_range=args.random_range,
+        packet_numbers=args.packet_number,
+        dry_run=args.dry_run
+    )
