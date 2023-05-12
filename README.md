@@ -44,7 +44,7 @@ It will be created if it doesn't exist.
 ### Optional arguments
 
 * `-h`, `--help`: show help message and exit
-* `-o`, `--output`: output PCAP file. Used only if a single input file is specified. Default: `<input_pcap>.edit.pcap`
+* `-o`, `--output`: output PCAP (and CSV) file path. Used only if a single input file is specified. Default: `edited/<input_pcap>.edit.pcap`
 * `-r`, `--random-range`: upper bound for the random range, which will select for each packet if it will be edited or not. In practice, each packet will be edited with a probability of `1/r`. Must be a strictly positive integer. Default: `1` (edit all packets).
 * `-n`, `--packet-number`: index of the packet to edit, starting from 1. Can be specified multiple times. If this is used, only the specified packets will be edited, and no random editing will be performed.
 * `-d`, `--dry-run`: don't write the output PCAP file (but still write the CSV log file)

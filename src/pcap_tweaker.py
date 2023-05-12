@@ -37,6 +37,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
     (Randomly) edit packet fields in a (list of) PCAP file(s).
 
     :param pcaps: list of input PCAP files
+    :param output: output PCAP file path. Used only if a single input file is specified.
     :param random_range: upper bound for random range (not included)
     :param packet_numbers: list of packet numbers to edit (starting from 1)
     :param dry_run: if True, do not write output PCAP file
@@ -52,10 +53,14 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
         logging.info(f"Read input PCAP file: {input_pcap}")
 
         # Open log CSV file
-        csv_dir = os.path.join(input_dir, "csv")
-        os.makedirs(csv_dir, exist_ok=True)
-        csv_log = os.path.basename(input_pcap).replace(".pcap", ".edit.csv")
-        csv_log = os.path.join(csv_dir, csv_log)
+        csv_log = ""
+        if output is not None and len(pcaps) == 1:
+            csv_log = output.replace(".pcap", ".csv")
+        else:
+            csv_dir = os.path.join(input_dir, "csv")
+            os.makedirs(csv_dir, exist_ok=True)
+            csv_log = os.path.basename(input_pcap).replace(".pcap", ".edit.csv")
+            csv_log = os.path.join(csv_dir, csv_log)
         with open(csv_log, "w") as csv_file:
             field_names = ["id", "timestamp", "protocol", "field", "old_value", "new_value"]
             writer = csv.DictWriter(csv_file, fieldnames=field_names)
@@ -101,13 +106,14 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
                         i += 1
 
         # Write output PCAP file
-        output_dir = os.path.join(os.path.dirname(input_pcap), "edited")
-        os.makedirs(output_dir, exist_ok=True)
+        output_pcap = ""
         if output is not None and len(pcaps) == 1:
             output_pcap = output
         else:
+            output_dir = os.path.join(os.path.dirname(input_pcap), "edited")
+            os.makedirs(output_dir, exist_ok=True)
             output_pcap = os.path.basename(input_pcap).replace(".pcap", ".edit.pcap")
-        output_pcap = os.path.join(output_dir, output_pcap)
+            output_pcap = os.path.join(output_dir, output_pcap)
         if dry_run:
             logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
         else:
@@ -133,7 +139,7 @@ if __name__ == "__main__":
     # Positional arguments: input PCAP file
     parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP files.")
     # Optional flag: -o / --output
-    parser.add_argument("-o", "--output", type=str, help="Output PCAP file name. Used only if a single input file is specified. Default: <input_pcap>.edit.pcap")
+    parser.add_argument("-o", "--output", type=str, help="Output PCAP (and CSV) file path. Used only if a single input file is specified. Default: edited/<input_pcap>.edit.pcap")
     # Optional flag: -r / --random-range
     parser.add_argument("-r", "--random-range", type=strictly_positive_int, default=1,
                         help="Upper bound for random range (not included). Must be a strictly positive integer. Default: 1 (edit each packet).")
