@@ -76,10 +76,13 @@ class DNS(Packet):
         # Field is query name
         elif field == "qname" and question_record is not None:
             old_value = question_record.getfieldval("qname")
+            suffix = old_value[-1]
+            old_value_trimmed = old_value[:-1]
             # Randomly change one character in query name
-            new_value = old_value
-            while new_value == old_value:
-                new_value = Packet.bytes_edit_char(old_value)
+            new_value_trimmed = old_value_trimmed
+            while new_value_trimmed == old_value_trimmed:
+                new_value_trimmed = Packet.bytes_edit_char(old_value_trimmed)
+            new_value = new_value_trimmed + bytes(chr(suffix), "utf-8")
             question_record.setfieldval("qname", new_value)
         
         # Update checksums
