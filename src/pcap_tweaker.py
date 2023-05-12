@@ -31,7 +31,7 @@ def strictly_positive_int(value: any) -> int:
         return ivalue
 
 
-def tweak_pcaps(pcaps: list, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
+def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
     """
     Main functionality of the program:
     (Randomly) edit packet fields in a (list of) PCAP file(s).
@@ -103,7 +103,10 @@ def tweak_pcaps(pcaps: list, random_range: int = 1, packet_numbers: list = None,
         # Write output PCAP file
         output_dir = os.path.join(os.path.dirname(input_pcap), "edited")
         os.makedirs(output_dir, exist_ok=True)
-        output_pcap = os.path.basename(input_pcap).replace(".pcap", ".edit.pcap")
+        if output is not None and len(pcaps) == 1:
+            output_pcap = output
+        else:
+            output_pcap = os.path.basename(input_pcap).replace(".pcap", ".edit.pcap")
         output_pcap = os.path.join(output_dir, output_pcap)
         if dry_run:
             logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
@@ -129,6 +132,8 @@ if __name__ == "__main__":
     )
     # Positional arguments: input PCAP file
     parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP files.")
+    # Optional flag: -o / --output
+    parser.add_argument("-o", "--output", type=str, help="Output PCAP file name. Used only if a single input file is specified. Default: <input_pcap>.edit.pcap")
     # Optional flag: -r / --random-range
     parser.add_argument("-r", "--random-range", type=strictly_positive_int, default=1,
                         help="Upper bound for random range (not included). Must be a strictly positive integer. Default: 1 (edit each packet).")
@@ -140,11 +145,15 @@ if __name__ == "__main__":
                         help="Dry run: do not write output PCAP file.")
     # Parse arguments
     args = parser.parse_args()
+    # Verify arguments
+    if args.output is not None and len(args.input_pcaps) > 1:
+        logging.warning("Multiple input PCAP files specified, ignoring output PCAP file name.")
 
 
     ### MAIN PROGRAM ###
     tweak_pcaps(
         pcaps=args.input_pcaps,
+        output=args.output,
         random_range=args.random_range,
         packet_numbers=args.packet_number,
         dry_run=args.dry_run
