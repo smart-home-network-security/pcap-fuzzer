@@ -70,6 +70,10 @@ class BOOTP(Packet):
         # Get field which will be modified
         field = random.choice(self.fields)
 
+        # Initialize old and new values
+        old_value = None
+        new_value = None
+
         if field == "chaddr":
             old_value = self.layer.getfieldval("chaddr")  # Store old value of field
             new_value = Packet.bytes_edit_char(old_value[:6]) + old_value[6:]  # Randomly change one byte in the MAC address

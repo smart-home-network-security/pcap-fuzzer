@@ -80,6 +80,10 @@ class CoAP(Packet):
         # Get field which will be modified
         field = random.choice(self.fields)
 
+        # Initialize old and new values
+        old_value = None
+        new_value = None
+
         # Chosen field is an integer
         if field == "type" or field == "code":
             old_value = self.layer.getfieldval(field)

@@ -52,6 +52,10 @@ class DNS(Packet):
         # Get auxiliary fields
         qdcount = self.layer.getfieldval("qdcount")
         question_record = self.layer.getfieldval("qd") if qdcount > 0 else None
+
+        # Initialize old and new values
+        old_value = None
+        new_value = None
         
         # Field is QR flag
         if field == "qr":
