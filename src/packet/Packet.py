@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Tuple
 import importlib
 import logging
 import string
@@ -153,6 +152,25 @@ class Packet:
         return self.packet
     
 
+    def get_length(self) -> int:
+        """
+        Get packet length.
+
+        :return: Packet length.
+        """
+        return len(self.packet)
+    
+
+    def get_length_from_layer(self, layer: int | str) -> int:
+        """
+        Get packet length, starting from a given layer.
+
+        :param layer: Layer index or name.
+        :return: Packet length starting from the given layer.
+        """
+        return len(self.packet.getlayer(layer))
+    
+
     def update_checksums(self) -> None:
         """
         Update packet checksums, if needed.
@@ -166,7 +184,7 @@ class Packet:
                 transport_layer.delfieldval("len")
             if hasattr(transport_layer, "chksum"):
                 transport_layer.delfieldval("chksum")
-            self.packet.show2(dump=True)
+            self.packet = self.packet.__class__(bytes(self.packet))
 
         
     def get_dict_log(self, field: str, old_value: str, new_value: str) -> dict:

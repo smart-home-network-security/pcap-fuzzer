@@ -63,8 +63,7 @@ class DNS(Packet):
         :return: Dictionary containing tweak information.
         """
         # Get field which will be modified
-        #field = random.choice(self.fields)
-        field = "qname"
+        field = random.choice(self.fields)
         # Get auxiliary fields
         qdcount = self.layer.getfieldval("qdcount")
         question_records = self.layer.getfieldval("qd") if qdcount > 0 else None

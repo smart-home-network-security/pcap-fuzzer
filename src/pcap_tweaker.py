@@ -29,6 +29,20 @@ def strictly_positive_int(value: any) -> int:
         if ivalue < 1:
             raise argparse.ArgumentTypeError(f"{value} does not represent a strictly positive integer.")
         return ivalue
+    
+
+def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
+    """
+    Check if a packet must be edited.
+
+    :param i: packet number (starting from 1)
+    :param packet_numbers: list of packet numbers to edit
+    :param random_range: upper bound for random range (not included)
+    :return: True if packet must be edited, False otherwise
+    """
+    is_specified = packet_numbers is not None and i in packet_numbers
+    is_random = packet_numbers is None and random.randrange(0, random_range) == 0
+    return is_specified or is_random
 
 
 def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
@@ -50,6 +64,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
 
         # Read input PCAP file
         packets = scapy.rdpcap(input_pcap)
+        new_packets = []
         logging.info(f"Read input PCAP file: {input_pcap}")
 
         # Open log CSV file
@@ -66,44 +81,29 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
             writer = csv.DictWriter(csv_file, fieldnames=field_names)
             writer.writeheader()
 
-            if packet_numbers is not None:
-                # Edit specific packets
-                for i in packet_numbers:
-                    packet = packets[i - 1]  # -1 because packet numbers start at 1
-                    try:
-                        my_packet = Packet.init_packet(packet, i)
-                    except ValueError:
-                        # No supported protocol found in packet, skip it
-                        pass
-                    else:
-                        d = my_packet.tweak()
-                        if d is not None:
-                            writer.writerow(d)
+            i = 1
+            for packet in packets:
 
-            else:
-                # Randomly edit packets
-                i = 1
-                for packet in packets:
-
-                    # Choose randomly if we edit this packet
-                    if random.randrange(0, random_range) != 0:
-                        # Packet won't be edited
-                        # Go to next packet
-                        i += 1
-                        continue
-
+                if must_edit_packet(i, packet_numbers, random_range):
                     # Edit packet, if possible
                     try:
                         my_packet = Packet.init_packet(packet, i)
                     except ValueError:
                         # No supported protocol found in packet, skip it
+                        new_packets.append(packet)
                         pass
                     else:
                         d = my_packet.tweak()
+                        new_packets.append(my_packet.get_packet())
                         if d is not None:
                             writer.writerow(d)
                     finally:
                         i += 1
+                else:
+                    # Packet won't be edited
+                    # Go to next packet
+                    i += 1
+                    new_packets.append(packet)
 
         # Write output PCAP file
         output_pcap = ""
@@ -117,7 +117,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
         if dry_run:
             logging.info(f"Dry run: did not write output PCAP file: {output_pcap}")
         else:
-            scapy.wrpcap(output_pcap, packets)
+            scapy.wrpcap(output_pcap, new_packets)
             logging.info(f"Wrote output PCAP file: {output_pcap}")
 
 
