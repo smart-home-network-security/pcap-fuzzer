@@ -171,6 +171,13 @@ class Packet:
         return len(self.packet.getlayer(layer))
     
 
+    def rebuild(self) -> None:
+        """
+        Rebuild packet.
+        """
+        self.packet = self.packet.__class__(bytes(self.packet))
+    
+
     def update_checksums(self) -> None:
         """
         Update packet checksums, if needed.
@@ -184,7 +191,7 @@ class Packet:
                 transport_layer.delfieldval("len")
             if hasattr(transport_layer, "chksum"):
                 transport_layer.delfieldval("chksum")
-            self.packet = self.packet.__class__(bytes(self.packet))
+            self.rebuild()
 
         
     def get_dict_log(self, field: str, old_value: str, new_value: str) -> dict:

@@ -45,6 +45,16 @@ def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
     return is_specified or is_random
 
 
+def rebuild_packet(packet: scapy.Packet) -> scapy.Packet:
+    """
+    Rebuild a Scapy packet from its bytes representation.
+
+    :param packet: Scapy packet
+    :return: Rebuilt Scapy packet
+    """
+    return packet.__class__(bytes(packet))
+
+
 def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
     """
     Main functionality of the program:
@@ -90,7 +100,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
                         my_packet = Packet.init_packet(packet, i)
                     except ValueError:
                         # No supported protocol found in packet, skip it
-                        new_packets.append(packet)
+                        new_packets.append(rebuild_packet(packet))
                         pass
                     else:
                         d = my_packet.tweak()
@@ -103,7 +113,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
                     # Packet won't be edited
                     # Go to next packet
                     i += 1
-                    new_packets.append(packet)
+                    new_packets.append(rebuild_packet(packet))
 
         # Write output PCAP file
         output_pcap = ""
