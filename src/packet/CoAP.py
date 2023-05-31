@@ -101,7 +101,7 @@ class CoAP(Packet):
             self.layer.setfieldval("options", result["new_options"])
         
         # Update checksums
-        self.update_checksums()
+        self.update_fields()
 
         # Return value: dictionary containing tweak information
         return self.get_dict_log(field, old_value, new_value)

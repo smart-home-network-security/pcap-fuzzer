@@ -33,14 +33,9 @@ class IGMPv3mr(Packet):
             new_value += new_address
             group.setfieldval("maddr", new_address)
             i += 1
-        
-        logging.info(f"Packet {self.id}: randomized all IGMPv3 group addresses.")
 
         # Update checksums
-        del self.packet.getlayer("IGMPv3").chksum
-        del self.packet.getlayer("IP").len
-        del self.packet.getlayer("IP").chksum
-        self.packet = scapy.Ether(self.packet.build())
+        self.update_fields()
 
         # Return value: dictionary containing tweak information
         return self.get_dict_log("maddr", old_value, new_value)

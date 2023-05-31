@@ -194,19 +194,29 @@ class Packet:
         self.packet.time = timestamp
     
 
-    def update_checksums(self) -> None:
+    def update_fields(self) -> None:
         """
-        Update packet checksums, if needed.
+        Update checksum and length fields on all relevant layers,
+        and rebuild packet.
         """
-        if self.packet.haslayer("IP"):
-            ip_layer = self.packet.getlayer("IP")
-            ip_layer.delfieldval("len")
-            ip_layer.delfieldval("chksum")
-            transport_layer = self.packet.getlayer(2)
-            if hasattr(transport_layer, "len"):
-                transport_layer.delfieldval("len")
-            if hasattr(transport_layer, "chksum"):
-                transport_layer.delfieldval("chksum")
+        # Loop on all packet layers
+        i = 0
+        while True:
+            layer = self.packet.getlayer(i)
+            if layer is None:
+                break
+            
+            # Delete checksum field
+            if hasattr(layer, "chksum") and layer.getfieldval("chksum") is not None:
+                layer.delfieldval("chksum")
+
+            # Delete length field
+            if hasattr(layer, "len") and layer.getfieldval("len") is not None:
+                layer.delfieldval("len")
+            
+            i += 1
+
+        # Rebuild packet, to update deleted fields
         self.rebuild()
 
         
@@ -305,7 +315,7 @@ class Packet:
         self.layer.setfieldval(field, new_value)
 
         # Update checksums
-        self.update_checksums()
+        self.update_fields()
 
         # Return value: dictionary containing tweak information
         return self.get_dict_log(field, old_value, new_value)

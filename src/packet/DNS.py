@@ -110,7 +110,7 @@ class DNS(Packet):
                 question_record.setfieldval("qname", new_value_single)
         
         # Update checksums
-        self.update_checksums()
+        self.update_fields()
 
         # Return value: dictionary containing tweak information
         return self.get_dict_log(field, old_value, new_value)

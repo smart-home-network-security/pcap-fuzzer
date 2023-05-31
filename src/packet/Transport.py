@@ -50,7 +50,7 @@ class Transport(Packet):
         self.layer.setfieldval(field, new_value)
 
         # Update checksums, if needed
-        self.update_checksums()
+        self.update_fields()
 
         # Return value: dictionary containing tweak information
         return self.get_dict_log(field, old_value, new_value)

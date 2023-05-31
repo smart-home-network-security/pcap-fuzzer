@@ -91,7 +91,7 @@ class BOOTP(Packet):
             self.set_dhcp_option(field, new_value)  # Set new value for field
 
         # Update checksums
-        self.update_checksums()
+        self.update_fields()
 
         # Return value: dictionary containing tweak information
         return self.get_dict_log(field, old_value, new_value)
