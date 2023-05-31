@@ -96,24 +96,29 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
 
                 if must_edit_packet(i, packet_numbers, random_range):
                     # Edit packet, if possible
-                    try:
-                        my_packet = Packet.init_packet(packet, i)
-                    except ValueError:
-                        # No supported protocol found in packet, skip it
-                        new_packets.append(rebuild_packet(packet))
-                        pass
-                    else:
-                        d = my_packet.tweak()
-                        new_packets.append(my_packet.get_packet())
-                        if d is not None:
-                            writer.writerow(d)
-                    finally:
-                        i += 1
+                    last_layer_index = Packet.get_last_layer_index(packet)
+                    while True:
+                        try:
+                            my_packet = Packet.init_packet(packet, i, last_layer_index)
+                        except ValueError:
+                            # No supported protocol found in packet, skip it
+                            new_packets.append(rebuild_packet(packet))
+                            break
+                        else:
+                            d = my_packet.tweak()
+                            if d is None:
+                                # Packet was not edited, try editing one layer lower
+                                last_layer_index = my_packet.get_layer_index() - 1
+                            else:
+                                # Packet was edited
+                                new_packets.append(my_packet.get_packet())
+                                writer.writerow(d)
+                                break
                 else:
                     # Packet won't be edited
-                    # Go to next packet
-                    i += 1
                     new_packets.append(rebuild_packet(packet))
+
+                i += 1
 
         # Write output PCAP file
         output_pcap = ""

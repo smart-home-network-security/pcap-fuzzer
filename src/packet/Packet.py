@@ -97,17 +97,20 @@ class Packet:
 
 
     @classmethod
-    def init_packet(c, packet: scapy.Packet, id: int = 0) -> Packet:
+    def init_packet(c, packet: scapy.Packet, id: int = 0, last_layer_index: int = -1) -> Packet:
         """
         Factory method to create a packet of a given protocol.
 
         :param packet: Scapy Packet to be edited.
-        :param id: Packet integer identifier.
+        :param id: [Optional] Packet integer identifier. Default is 0.
+        :param last_layer_index: [Optional] Index of the last layer of the packet.
+                                 If not specified, it will be calculated.
         :return: Packet of given protocol,
                  or generic Packet if protocol is not supported.
         """
         # Try creating specific packet if possible
-        last_layer_index = Packet.get_last_layer_index(packet)
+        if last_layer_index == -1:
+            last_layer_index = Packet.get_last_layer_index(packet)
         for i in range(last_layer_index, -1, -1):
             layer = packet.getlayer(i)
             try:
@@ -120,7 +123,7 @@ class Packet:
                     protocol = Packet.protocols.get(protocol, protocol)
                 module = importlib.import_module(f"packet.{protocol}")
                 cls = getattr(module, protocol)
-                return cls(packet, id)
+                return cls(packet, id, i)
             except ModuleNotFoundError:
                 # Layer protocol not supported
                 continue
@@ -128,19 +131,21 @@ class Packet:
         raise ValueError(f"No supported protocol found for packet: {packet.summary()}")
 
 
-    def __init__(self, packet: scapy.Packet, id: int = 0) -> None:
+    def __init__(self, packet: scapy.Packet, id: int = 0, last_layer_index: int = -1) -> None:
         """
         Generic packet constructor.
 
         :param packet: Scapy Packet to be edited.
         :param id: Packet integer identifier.
+        :param last_layer_index: [Optional] Index of the last layer of the packet.
+                                 If not specified, it will be calculated.
         """
         self.id = id
         self.packet = packet
-        try:
-            self.layer = packet.getlayer(self.name)
-        except AttributeError:
-            self.layer = packet.lastlayer()
+        self.layer_index = last_layer_index if last_layer_index != -1 else Packet.get_last_layer_index(packet)
+        self.layer = packet.getlayer(self.name)
+        if self.layer is None:
+            self.layer = packet.getlayer(self.layer_index)
 
     
     def get_packet(self) -> scapy.Packet:
@@ -169,6 +174,15 @@ class Packet:
         :return: Packet length starting from the given layer.
         """
         return len(self.packet.getlayer(layer))
+    
+
+    def get_layer_index(self) -> int:
+        """
+        Get packet layer index.
+
+        :return: Packet layer index.
+        """
+        return self.layer_index
     
 
     def rebuild(self) -> None:

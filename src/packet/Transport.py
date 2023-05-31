@@ -20,8 +20,9 @@ class Transport(Packet):
 
     def tweak(self) -> dict:
         """
-        Randomly edit destination or source port,
-        in this order of priority.
+        If one of the ports is a well-known port,
+        randomly edit destination or source port,
+        in this respective order of priority.
 
         :return: Dictionary containing tweak information,
                  or None if no tweak was performed.
