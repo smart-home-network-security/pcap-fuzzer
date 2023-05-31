@@ -47,12 +47,16 @@ def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
 
 def rebuild_packet(packet: scapy.Packet) -> scapy.Packet:
     """
-    Rebuild a Scapy packet from its bytes representation.
+    Rebuild a Scapy packet from its bytes representation,
+    but keep its old timestamp.
 
     :param packet: Scapy packet
-    :return: Rebuilt Scapy packet
+    :return: Rebuilt Scapy packet, with old timestamp
     """
-    return packet.__class__(bytes(packet))
+    timestamp = packet.time
+    new_packet = packet.__class__(bytes(packet))
+    new_packet.time = timestamp
+    return new_packet
 
 
 def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:

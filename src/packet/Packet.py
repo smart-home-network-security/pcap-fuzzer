@@ -187,9 +187,11 @@ class Packet:
 
     def rebuild(self) -> None:
         """
-        Rebuild packet.
+        Rebuild packet, but keep old timestamp.
         """
+        timestamp = self.packet.time
         self.packet = self.packet.__class__(bytes(self.packet))
+        self.packet.time = timestamp
     
 
     def update_checksums(self) -> None:
@@ -302,7 +304,7 @@ class Packet:
         # Set new value for field
         self.layer.setfieldval(field, new_value)
 
-        # Update checksums, if needed
+        # Update checksums
         self.update_checksums()
 
         # Return value: dictionary containing tweak information
