@@ -205,7 +205,7 @@ class Packet:
                 transport_layer.delfieldval("len")
             if hasattr(transport_layer, "chksum"):
                 transport_layer.delfieldval("chksum")
-            self.rebuild()
+        self.rebuild()
 
         
     def get_dict_log(self, field: str, old_value: str, new_value: str) -> dict:
