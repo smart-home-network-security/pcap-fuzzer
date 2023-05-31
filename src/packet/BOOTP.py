@@ -20,14 +20,16 @@ class BOOTP(Packet):
     ]
 
 
-    def __init__(self, packet: scapy.Packet, id: int = 0) -> None:
+    def __init__(self, packet: scapy.Packet, id: int = 0, last_layer_index: int = -1) -> None:
         """
         BOOTP/DHCP packet constructor.
 
         :param packet: Scapy Packet to be edited.
         :param id: Packet integer identifier.
+        :param last_layer_index: [Optional] Index of the last layer of the packet.
+                                 If not specified, it will be calculated.
         """
-        super().__init__(packet, id)
+        super().__init__(packet, id, last_layer_index)
         self.dhcp_options = packet.getlayer("DHCP options")
 
 
