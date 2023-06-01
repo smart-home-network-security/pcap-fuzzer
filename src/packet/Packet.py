@@ -116,9 +116,14 @@ class Packet:
             try:
                 protocol = layer.name.replace(" ", "_")
                 if protocol == "IP" and packet.getfieldval("version") == 4:
+                    # IPv4 packet
                     protocol = "IPv4"
                 elif protocol == "IP" and packet.getfieldval("version") == 6:
+                    # IPv6 packet
                     protocol = "IPv6"
+                elif protocol == "DNS" and packet.getfieldval("sport") == 5353 and packet.getfieldval("sport") == 5353:
+                    # mDNS packet
+                    protocol = "mDNS"
                 else:
                     protocol = Packet.protocols.get(protocol, protocol)
                 module = importlib.import_module(f"packet.{protocol}")

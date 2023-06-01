@@ -52,6 +52,15 @@ class DNS(Packet):
             layer_idx += 1
             question_record = question_records.getlayer(layer_idx)
 
+    
+    def get_field(self) -> str:
+        """
+        Randomly pick a DNS field to be modified.
+
+        :return: Field name.
+        """
+        return random.choice(self.fields)
+
 
     def tweak(self) -> dict:
         """
@@ -63,7 +72,8 @@ class DNS(Packet):
         :return: Dictionary containing tweak information.
         """
         # Get field which will be modified
-        field = random.choice(self.fields)
+        field = self.get_field()
+        
         # Get auxiliary fields
         qdcount = self.layer.getfieldval("qdcount")
         question_records = self.layer.getfieldval("qd") if qdcount > 0 else None
