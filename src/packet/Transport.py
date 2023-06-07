@@ -27,6 +27,8 @@ class Transport(Packet):
         :return: Dictionary containing tweak information,
                  or None if no tweak was performed.
         """
+        # Store old hash value
+        old_hash = self.get_hash()
         # Check if destination port is a well-known port
         if self.layer.getfieldval("dport") in self.ports:
             field = "dport"
@@ -53,4 +55,4 @@ class Transport(Packet):
         self.update_fields()
 
         # Return value: dictionary containing tweak information
-        return self.get_dict_log(field, old_value, new_value)
+        return self.get_dict_log(field, old_value, new_value, old_hash)

@@ -6,6 +6,7 @@ import re
 import random
 from ipaddress import IPv4Address, IPv6Address
 import scapy.all as scapy
+import hashlib
 
 class Packet:
     """
@@ -190,6 +191,15 @@ class Packet:
         return self.layer_index
     
 
+    def get_hash(self) -> str:
+        """
+        Get packet hash.
+
+        :return: Packet hash.
+        """
+        return hashlib.sha256(bytes(self.packet)).hexdigest()
+    
+
     def rebuild(self) -> None:
         """
         Rebuild packet, but keep old timestamp.
@@ -225,7 +235,7 @@ class Packet:
         self.rebuild()
 
         
-    def get_dict_log(self, field: str, old_value: str, new_value: str) -> dict:
+    def get_dict_log(self, field: str, old_value: str, new_value: str, old_hash: str) -> dict:
         """
         Log packet field modification,
         and return a dictionary containing tweak information.
@@ -233,6 +243,7 @@ class Packet:
         :param field: Field name.
         :param old_value: Old field value.
         :param new_value: New field value.
+        :param old_hash: Old packet hash (before tweak).
         :return: Dictionary containing tweak information.
         """
         timestamp = self.packet.time
@@ -243,7 +254,9 @@ class Packet:
             "protocol": self.name,
             "field": field,
             "old_value": old_value,
-            "new_value": new_value
+            "new_value": new_value,
+            "old_hash": old_hash,
+            "new_hash": self.get_hash()
         }
         return d
 
@@ -255,6 +268,8 @@ class Packet:
         :return: Dictionary containing tweak information,
                  or None if no tweak was performed.
         """
+        # Store old hash value
+        old_hash = self.get_hash()
         # Get field which will be modified
         field, value_type = random.choice(list(self.fields.items()))
         # Store old value of field
@@ -323,4 +338,4 @@ class Packet:
         self.update_fields()
 
         # Return value: dictionary containing tweak information
-        return self.get_dict_log(field, old_value, new_value)
+        return self.get_dict_log(field, old_value, new_value, old_hash)

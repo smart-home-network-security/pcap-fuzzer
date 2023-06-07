@@ -77,6 +77,8 @@ class CoAP(Packet):
 
         :return: Dictionary containing tweak information.
         """
+        # Store old hash value
+        old_hash = self.get_hash()
         # Get field which will be modified
         field = random.choice(self.fields)
 
@@ -104,4 +106,4 @@ class CoAP(Packet):
         self.update_fields()
 
         # Return value: dictionary containing tweak information
-        return self.get_dict_log(field, old_value, new_value)
+        return self.get_dict_log(field, old_value, new_value, old_hash)

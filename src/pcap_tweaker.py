@@ -10,6 +10,7 @@ import csv
 import scapy.all as scapy
 from scapy.layers import dhcp, dns, http
 from scapy.contrib import coap, igmp, igmpv3
+import hashlib
 from packet.Packet import Packet
 
 
@@ -59,6 +60,16 @@ def rebuild_packet(packet: scapy.Packet) -> scapy.Packet:
     return new_packet
 
 
+def get_packet_hash(packet: scapy.Packet) -> str:
+    """
+    Get the SHA256 hash of a Scapy packet.
+
+    :param packet: Scapy packet
+    :return: SHA256 hash of Scapy packet
+    """
+    return hashlib.sha256(bytes(packet)).hexdigest()
+
+
 def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
     """
     Main functionality of the program:
@@ -91,7 +102,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
             csv_log = os.path.basename(input_pcap).replace(".pcap", ".edit.csv")
             csv_log = os.path.join(csv_dir, csv_log)
         with open(csv_log, "w") as csv_file:
-            field_names = ["id", "timestamp", "protocol", "field", "old_value", "new_value"]
+            field_names = ["id", "timestamp", "protocol", "field", "old_value", "new_value", "old_hash", "new_hash"]
             writer = csv.DictWriter(csv_file, fieldnames=field_names)
             writer.writeheader()
 

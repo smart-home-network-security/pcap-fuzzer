@@ -19,6 +19,8 @@ class IGMPv3mr(Packet):
 
         :return: Dictionary containing tweak information.
         """
+        # Store old hash value
+        old_hash = self.get_hash()
         # Set random IP address for all group records
         old_value = ""
         new_value = ""
@@ -38,4 +40,4 @@ class IGMPv3mr(Packet):
         self.update_fields()
 
         # Return value: dictionary containing tweak information
-        return self.get_dict_log("maddr", old_value, new_value)
+        return self.get_dict_log("maddr", old_value, new_value, old_hash)
