@@ -10,7 +10,6 @@ import csv
 import scapy.all as scapy
 from scapy.layers import dhcp, dns, http
 from scapy.contrib import coap, igmp, igmpv3
-import hashlib
 from packet.Packet import Packet
 
 
@@ -44,30 +43,6 @@ def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
     is_specified = packet_numbers is not None and i in packet_numbers
     is_random = packet_numbers is None and random.randrange(0, random_range) == 0
     return is_specified or is_random
-
-
-def rebuild_packet(packet: scapy.Packet) -> scapy.Packet:
-    """
-    Rebuild a Scapy packet from its bytes representation,
-    but keep its old timestamp.
-
-    :param packet: Scapy packet
-    :return: Rebuilt Scapy packet, with old timestamp
-    """
-    timestamp = packet.time
-    new_packet = packet.__class__(bytes(packet))
-    new_packet.time = timestamp
-    return new_packet
-
-
-def get_packet_hash(packet: scapy.Packet) -> str:
-    """
-    Get the SHA256 hash of a Scapy packet.
-
-    :param packet: Scapy packet
-    :return: SHA256 hash of Scapy packet
-    """
-    return hashlib.sha256(bytes(packet)).hexdigest()
 
 
 def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
@@ -117,7 +92,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
                             my_packet = Packet.init_packet(packet, i, last_layer_index)
                         except ValueError:
                             # No supported protocol found in packet, skip it
-                            new_packets.append(rebuild_packet(packet))
+                            new_packets.append(Packet.rebuild_packet(packet))
                             break
                         else:
                             d = my_packet.tweak()
@@ -131,7 +106,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
                                 break
                 else:
                     # Packet won't be edited
-                    new_packets.append(rebuild_packet(packet))
+                    new_packets.append(Packet.rebuild_packet(packet))
 
                 i += 1
 

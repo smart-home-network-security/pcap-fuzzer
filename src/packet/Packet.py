@@ -8,14 +8,19 @@ from ipaddress import IPv4Address, IPv6Address
 import scapy.all as scapy
 import hashlib
 
+
 class Packet:
     """
     Wrapper around the Scapy `Packet` class.
     """
 
+    ##### CLASS VARIABLES #####
+
     # List of all alphanumerical characters
     ALPHANUM_CHARS = list(string.ascii_letters + string.digits)
     ALPHANUM_BYTES = list(bytes(string.ascii_letters + string.digits, "utf-8"))
+    # Minimun payload length (in bytes)
+    MIN_PAYLOAD_LENGTH = 46
 
     # Protocol name correspondences
     protocols = {
@@ -24,6 +29,10 @@ class Packet:
 
     # Modifiable fields, will be overridden by child classes
     fields = {}
+
+
+
+    ##### STATIC METHODS #####
 
 
     @staticmethod
@@ -97,6 +106,21 @@ class Packet:
         return i - 1
 
 
+    @staticmethod
+    def rebuild_packet(packet: scapy.Packet) -> scapy.Packet:
+        """
+        Rebuild a Scapy packet from its bytes representation,
+        but keep its old timestamp.
+
+        :param packet: Scapy packet
+        :return: Rebuilt Scapy packet, with old timestamp
+        """
+        timestamp = packet.time
+        new_packet = packet.__class__(bytes(packet))
+        new_packet.time = timestamp
+        return new_packet
+
+
     @classmethod
     def init_packet(c, packet: scapy.Packet, id: int = 0, last_layer_index: int = -1) -> Packet:
         """
@@ -135,6 +159,10 @@ class Packet:
                 continue
         # No supported protocol found, raise ValueError
         raise ValueError(f"No supported protocol found for packet: {packet.summary()}")
+    
+
+
+    ##### INSTANCE METHODS #####
 
 
     def __init__(self, packet: scapy.Packet, id: int = 0, last_layer_index: int = -1) -> None:
@@ -193,11 +221,14 @@ class Packet:
 
     def get_hash(self) -> str:
         """
-        Get packet hash.
+        Get packet payload SHA256 hash.
+        The payload is first padded with null bytes to reach the minimum Ethernet payload length of 46 bytes.
 
-        :return: Packet hash.
+        :return: Packet payload SHA256 hash.
         """
-        return hashlib.sha256(bytes(self.packet)).hexdigest()
+        pad_bytes_to_add = Packet.MIN_PAYLOAD_LENGTH - len(self.packet.payload)
+        payload = bytes(self.packet.payload) + bytes(pad_bytes_to_add) if pad_bytes_to_add > 0 else bytes(self.packet.payload)
+        return hashlib.sha256(payload).hexdigest()
     
 
     def rebuild(self) -> None:
