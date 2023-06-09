@@ -141,8 +141,8 @@ if __name__ == "__main__":
         prog=script_name,
         description="Randomly edit packet fields in a PCAP file."
     )
-    # Positional arguments: input PCAP file
-    parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP files.")
+    # Positional arguments: input PCAP file(s)
+    parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP file(s).")
     # Optional flag: -o / --output
     parser.add_argument("-o", "--output", type=str, help="Output PCAP (and CSV) file path. Used only if a single input file is specified. Default: edited/<input_pcap>.edit.pcap")
     # Optional flag: -r / --random-range
