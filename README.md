@@ -1,4 +1,4 @@
-# pcap-tweaker
+# pcap-fuzzer
 This program randomly edits packets from a PCAP file,
 one field per edited packet.
 
