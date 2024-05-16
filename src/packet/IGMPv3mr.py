@@ -1,4 +1,3 @@
-from scapy.contrib import igmpv3
 from packet.Packet import Packet
 
 class IGMPv3mr(Packet):
