@@ -1,4 +1,3 @@
-import scapy.all as scapy
 from packet.Packet import Packet
 
 class ICMP(Packet):

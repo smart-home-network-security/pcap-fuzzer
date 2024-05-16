@@ -1,5 +1,3 @@
-import scapy.all as scapy
-from scapy.layers import http
 from packet.Packet import Packet
 
 class HTTP_Request(Packet):

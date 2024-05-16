@@ -1,4 +1,4 @@
-# pcap-tweaker
+# pcap-fuzzer
 This program randomly edits packets from a PCAP file,
 one field per edited packet.
 
@@ -22,7 +22,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python3 pcap_tweaker.py [-h] [-o OUTPUT] [-r RANDOM_RANGE] [-n PACKET_NUMBER] [-d] pcap [pcap ...]
+python3 pcap_fuzzer.py [-h] [-o OUTPUT] [-r RANDOM_RANGE] [-n PACKET_NUMBER] [-d] pcap [pcap ...]
 ```
 
 The program produces new PCAP file with the same name as the input files,

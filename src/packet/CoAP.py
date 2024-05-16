@@ -1,7 +1,4 @@
-import logging
 import random
-import scapy.all as scapy
-from scapy.contrib import coap
 from packet.Packet import Packet
 
 class CoAP(Packet):
@@ -68,14 +65,14 @@ class CoAP(Packet):
         return result
 
 
-    def tweak(self) -> dict:
+    def fuzz(self) -> dict:
         """
         Randomly edit one field of the CoAP packet, among the following:
             - type
             - code
             - uri
 
-        :return: Dictionary containing tweak information.
+        :return: Dictionary containing fuzz information.
         """
         # Store old hash value
         old_hash = self.get_hash()
@@ -105,5 +102,5 @@ class CoAP(Packet):
         # Update checksums
         self.update_fields()
 
-        # Return value: dictionary containing tweak information
+        # Return value: dictionary containing fuzz information
         return self.get_dict_log(field, old_value, new_value, old_hash)

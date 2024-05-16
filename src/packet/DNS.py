@@ -1,5 +1,4 @@
 import random
-import scapy.all as scapy
 from scapy.layers import dns
 from packet.Packet import Packet
 
@@ -62,14 +61,14 @@ class DNS(Packet):
         return random.choice(self.fields)
 
 
-    def tweak(self) -> dict:
+    def fuzz(self) -> dict:
         """
         Randomly edit one DNS field, among the following:
             - QR flag
             - Query type
             - Query name
 
-        :return: Dictionary containing tweak information.
+        :return: Dictionary containing fuzz information.
         """
         # Store old hash value
         old_hash = self.get_hash()
@@ -124,5 +123,5 @@ class DNS(Packet):
         # Update checksums
         self.update_fields()
 
-        # Return value: dictionary containing tweak information
+        # Return value: dictionary containing fuzz information
         return self.get_dict_log(field, old_value, new_value, old_hash)

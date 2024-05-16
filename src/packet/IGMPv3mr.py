@@ -1,5 +1,3 @@
-import logging
-import scapy.all as scapy
 from scapy.contrib import igmpv3
 from packet.Packet import Packet
 
@@ -12,12 +10,12 @@ class IGMPv3mr(Packet):
     name = "IGMPv3mr"
 
 
-    def tweak(self) -> dict:
+    def fuzz(self) -> dict:
         """
-        Tweak the IGMPv3 Membership Report packet,
+        fuzz the IGMPv3 Membership Report packet,
         by randomizing all group addresses.
 
-        :return: Dictionary containing tweak information.
+        :return: Dictionary containing fuzz information.
         """
         # Store old hash value
         old_hash = self.get_hash()
@@ -39,5 +37,5 @@ class IGMPv3mr(Packet):
         # Update checksums
         self.update_fields()
 
-        # Return value: dictionary containing tweak information
+        # Return value: dictionary containing fuzz information
         return self.get_dict_log("maddr", old_value, new_value, old_hash)

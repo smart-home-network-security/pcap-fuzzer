@@ -269,13 +269,13 @@ class Packet:
     def get_dict_log(self, field: str, old_value: str, new_value: str, old_hash: str) -> dict:
         """
         Log packet field modification,
-        and return a dictionary containing tweak information.
+        and return a dictionary containing fuzz information.
 
         :param field: Field name.
         :param old_value: Old field value.
         :param new_value: New field value.
-        :param old_hash: Old packet hash (before tweak).
-        :return: Dictionary containing tweak information.
+        :param old_hash: Old packet hash (before fuzz).
+        :return: Dictionary containing fuzz information.
         """
         timestamp = self.packet.time
         logging.info(f"Packet {self.id}, timestamp {timestamp}: {self.name}.{field} = {old_value} -> {new_value}")
@@ -292,12 +292,12 @@ class Packet:
         return d
 
 
-    def tweak(self) -> dict:
+    def fuzz(self) -> dict:
         """
         Randomly edit one packet field.
 
-        :return: Dictionary containing tweak information,
-                 or None if no tweak was performed.
+        :return: Dictionary containing fuzz information,
+                 or None if no fuzz was performed.
         """
         # Store old hash value
         old_hash = self.get_hash()
@@ -368,5 +368,5 @@ class Packet:
         # Update checksums
         self.update_fields()
 
-        # Return value: dictionary containing tweak information
+        # Return value: dictionary containing fuzz information
         return self.get_dict_log(field, old_value, new_value, old_hash)

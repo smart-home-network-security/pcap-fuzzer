@@ -1,8 +1,6 @@
-import logging
 from typing import Tuple
 import random
 import scapy.all as scapy
-from scapy.layers import dhcp
 from packet.Packet import Packet
 
 class BOOTP(Packet):
@@ -61,13 +59,13 @@ class BOOTP(Packet):
         self.dhcp_options.setfieldval("options", dhcp_options)
 
 
-    def tweak(self) -> dict:
+    def fuzz(self) -> dict:
         """
         Randomly edit a BOOTP/DHCP field, among the following:
             - chaddr (client hardware address)
             - message-type (DHCP message type)
 
-        :return: Dictionary containing tweak information.
+        :return: Dictionary containing fuzz information.
         """
         # Store old hash value
         old_hash = self.get_hash()
@@ -95,5 +93,5 @@ class BOOTP(Packet):
         # Update checksums
         self.update_fields()
 
-        # Return value: dictionary containing tweak information
+        # Return value: dictionary containing fuzz information
         return self.get_dict_log(field, old_value, new_value, old_hash)

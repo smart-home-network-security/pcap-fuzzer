@@ -1,6 +1,4 @@
 import random
-import scapy.all as scapy
-from scapy.layers import http
 from packet.Packet import Packet
 
 class Transport(Packet):
@@ -18,14 +16,14 @@ class Transport(Packet):
     ports = []
 
 
-    def tweak(self) -> dict:
+    def fuzz(self) -> dict:
         """
         If one of the ports is a well-known port,
         randomly edit destination or source port,
         in this respective order of priority.
 
-        :return: Dictionary containing tweak information,
-                 or None if no tweak was performed.
+        :return: Dictionary containing fuzz information,
+                 or None if no fuzz was performed.
         """
         # Store old hash value
         old_hash = self.get_hash()
@@ -36,7 +34,7 @@ class Transport(Packet):
         elif self.layer.getfieldval("sport") in self.ports:
             field = "sport"
         else:
-            # No well-known port, do not tweak
+            # No well-known port, do not fuzz
             return None
         
         # Store old value of field
@@ -54,5 +52,5 @@ class Transport(Packet):
         # Update checksums, if needed
         self.update_fields()
 
-        # Return value: dictionary containing tweak information
+        # Return value: dictionary containing fuzz information
         return self.get_dict_log(field, old_value, new_value, old_hash)

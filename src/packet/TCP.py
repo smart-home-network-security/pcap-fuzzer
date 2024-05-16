@@ -1,4 +1,3 @@
-import scapy.all as scapy
 from packet.Transport import Transport
 
 class TCP(Transport):

@@ -45,7 +45,7 @@ def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
     return is_specified or is_random
 
 
-def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
+def fuzz_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
     """
     Main functionality of the program:
     (Randomly) edit packet fields in a (list of) PCAP file(s).
@@ -95,7 +95,7 @@ def tweak_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers:
                             new_packets.append(Packet.rebuild_packet(packet))
                             break
                         else:
-                            d = my_packet.tweak()
+                            d = my_packet.fuzz()
                             if d is None:
                                 # Packet was not edited, try editing one layer lower
                                 last_layer_index = my_packet.get_layer_index() - 1
@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
 
     ### MAIN PROGRAM ###
-    tweak_pcaps(
+    fuzz_pcaps(
         pcaps=args.input_pcaps,
         output=args.output,
         random_range=args.random_range,
