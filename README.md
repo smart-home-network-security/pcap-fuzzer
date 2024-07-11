@@ -21,6 +21,17 @@ pip install -r requirements.txt
 
 ## Usage
 
+### From PyPI
+
+```bash
+pip install pcap-fuzzer
+```
+
+See documentation: [https://pypi.org/project/pcap-fuzzer/](https://pypi.org/project/pcap-fuzzer/).
+
+
+### Directly from sources
+
 ```bash
 python3 pcap_fuzzer.py [-h] [-o OUTPUT] [-r RANDOM_RANGE] [-n PACKET_NUMBER] [-d] pcap [pcap ...]
 ```
@@ -50,7 +61,7 @@ It will be created if it doesn't exist.
 * `-d`, `--dry-run`: don't write the output PCAP file (but still write the CSV log file)
 
 
-## Supported protocols
+## Supported protocols (for now)
 
 * Datalink Layer (2)
   * ARP
