@@ -1,6 +1,6 @@
 import random
 import scapy.all as scapy
-from packet.DNS import DNS
+from DNS import DNS
 
 class mDNS(DNS):
 

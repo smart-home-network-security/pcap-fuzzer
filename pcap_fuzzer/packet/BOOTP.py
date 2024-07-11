@@ -1,7 +1,7 @@
 from typing import Tuple
 import random
 import scapy.all as scapy
-from packet.Packet import Packet
+from Packet import Packet
 
 class BOOTP(Packet):
     """

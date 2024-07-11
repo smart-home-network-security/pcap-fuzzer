@@ -1,4 +1,4 @@
-from packet.Transport import Transport
+from Transport import Transport
 
 class UDP(Transport):
 

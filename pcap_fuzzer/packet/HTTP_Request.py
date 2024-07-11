@@ -1,4 +1,4 @@
-from packet.Packet import Packet
+from Packet import Packet
 
 class HTTP_Request(Packet):
 

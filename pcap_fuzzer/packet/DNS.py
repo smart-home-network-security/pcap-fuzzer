@@ -1,6 +1,6 @@
 import random
 from scapy.layers import dns
-from packet.Packet import Packet
+from Packet import Packet
 
 class DNS(Packet):
 

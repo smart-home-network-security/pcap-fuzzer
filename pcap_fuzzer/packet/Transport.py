@@ -1,5 +1,5 @@
 import random
-from packet.Packet import Packet
+from Packet import Packet
 
 class Transport(Packet):
     """
