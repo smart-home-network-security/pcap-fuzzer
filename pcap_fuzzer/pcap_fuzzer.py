@@ -14,7 +14,7 @@ import scapy.all as scapy
 from scapy.layers import dhcp, dns, http
 from scapy.contrib import coap, igmp, igmpv3
 # Custom Packet utilities
-from packet.Packet import Packet
+from .packet.Packet import Packet
 
 
 def strictly_positive_int(value: any) -> int:
@@ -61,7 +61,7 @@ def fuzz_pcaps(pcaps: Union[str, list], output: str, random_range: int = 1, pack
     :param dry_run: if True, do not write output PCAP file
     """
     # If input PCAP is a single file, convert to list of one element
-    pcaps = [pcaps] if isinstance(pcaps) != list else pcaps
+    pcaps = [pcaps] if not isinstance(pcaps, list) else pcaps
     
     # Loop on given input PCAP files
     for input_pcap in pcaps:
@@ -165,9 +165,6 @@ if __name__ == "__main__":
     # Verify arguments
     if args.output is not None and len(args.input_pcaps) > 1:
         logging.warning("Multiple input PCAP files specified, ignoring output PCAP file name.")
-
-    print(args.input_pcaps)
-    exit()
 
 
     ### MAIN PROGRAM ###
