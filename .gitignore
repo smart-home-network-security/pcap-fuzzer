@@ -10,3 +10,6 @@ dist
 # Temp files
 *.log
 csv
+
+# Package build script
+build_and_publish.sh

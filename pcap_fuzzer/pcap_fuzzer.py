@@ -2,14 +2,18 @@
 Randomly edit packet fields in a PCAP file.
 """
 
+## Import libraries
 import os
 import argparse
+from typing import Union
 import random
 import logging
 import csv
+# Scapy libraries
 import scapy.all as scapy
 from scapy.layers import dhcp, dns, http
 from scapy.contrib import coap, igmp, igmpv3
+# Custom Packet utilities
 from packet.Packet import Packet
 
 
@@ -45,7 +49,7 @@ def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
     return is_specified or is_random
 
 
-def fuzz_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
+def fuzz_pcaps(pcaps: Union[str, list], output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
     """
     Main functionality of the program:
     (Randomly) edit packet fields in a (list of) PCAP file(s).
@@ -56,6 +60,8 @@ def fuzz_pcaps(pcaps: list, output: str, random_range: int = 1, packet_numbers: 
     :param packet_numbers: list of packet numbers to edit (starting from 1)
     :param dry_run: if True, do not write output PCAP file
     """
+    # If input PCAP is a single file, convert to list of one element
+    pcaps = [pcaps] if isinstance(pcaps) != list else pcaps
     
     # Loop on given input PCAP files
     for input_pcap in pcaps:
@@ -159,6 +165,9 @@ if __name__ == "__main__":
     # Verify arguments
     if args.output is not None and len(args.input_pcaps) > 1:
         logging.warning("Multiple input PCAP files specified, ignoring output PCAP file name.")
+
+    print(args.input_pcaps)
+    exit()
 
 
     ### MAIN PROGRAM ###
