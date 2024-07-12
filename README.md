@@ -29,7 +29,7 @@ import pcap_fuzzer
 ```python
 pcap_fuzzer.fuzz_pcaps(
     pcaps: Union[str, list]       # (List of) input PCAP files
-    output: str,                  # Output PCAP file path. Used only if a single input file is specified.
+    output: str,                  # [Optional] Output PCAP file path. Used only if a single input file is specified.
     random_range: int = 1,        # [Optional] Upper bound for random range (not included). Defaults to 1.
     packet_numbers: list = None,  # [Optional] List of indices, starting from 1, of packets to edit. If not specified, packets are randomly picked.
     dry_run: bool = False         # [Optional] If True, do not write output PCAP file(s).

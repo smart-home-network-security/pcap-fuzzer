@@ -49,7 +49,7 @@ def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
     return is_specified or is_random
 
 
-def fuzz_pcaps(pcaps: Union[str, list], output: str, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
+def fuzz_pcaps(pcaps: Union[str, list], output: str = None, random_range: int = 1, packet_numbers: list = None, dry_run: bool = False) -> None:
     """
     Main functionality of the program:
     (Randomly) edit packet fields in a (list of) PCAP file(s).
@@ -117,7 +117,6 @@ def fuzz_pcaps(pcaps: Union[str, list], output: str, random_range: int = 1, pack
                 i += 1
 
         # Write output PCAP file
-        output_pcap = ""
         if output is not None and len(pcaps) == 1:
             output_pcap = output
         else:
@@ -150,7 +149,7 @@ if __name__ == "__main__":
     # Positional arguments: input PCAP file(s)
     parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP file(s).")
     # Optional flag: -o / --output
-    parser.add_argument("-o", "--output", type=str, help="Output PCAP (and CSV) file path. Used only if a single input file is specified. Default: edited/<input_pcap>.edit.pcap")
+    parser.add_argument("-o", "--output", type=str, default=None, help="Output PCAP (and CSV) file path. Used only if a single input file is specified. Default: edited/<input_pcap>.edit.pcap")
     # Optional flag: -r / --random-range
     parser.add_argument("-r", "--random-range", type=strictly_positive_int, default=1,
                         help="Upper bound for random range (not included). Must be a strictly positive integer. Default: 1 (edit each packet).")

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pcap_fuzzer',
-    version='0.3.0',
+    version='0.4.0',
     author='François De Keersmaeker',
     author_email='francois.dekeersmaeker@uclouvain.be',
     description='Randomly edit packet fields in a PCAP file.',
