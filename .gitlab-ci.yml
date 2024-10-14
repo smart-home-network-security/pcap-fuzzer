@@ -3,5 +3,6 @@ job-test:
     - python3 -m venv .venv                 # Create Python virtual environment
     - source .venv/bin/activate             # Activate Python virtual environment
     - pip3 install -r requirements.txt      # Install Python dependencies
+    - pip3 install wheel                    # Install wheel package for build
     - pip3 install .                        # Install the package
     - python3 .ci_scripts/run-all-pcaps.py  # Run fuzzer on all PCAP files
