@@ -2,6 +2,7 @@
 
 # Imports
 import os
+from pathlib import Path
 import glob
 import pcap_fuzzer
 
@@ -10,8 +11,9 @@ import pcap_fuzzer
 if __name__ == "__main__":
 
     # Get paths
-    workspace_path = os.environ["GITHUB_WORKSPACE"]
-    traces_dir = os.path.join(workspace_path, "traces")
+    self_path = Path(os.path.abspath(__file__))
+    base_dir = self_path.parents[1]
+    traces_dir = os.path.join(base_dir, "traces")
 
     # Get all PCAP files
     all_pcaps = glob.glob(f"{traces_dir}/*.pcap")

@@ -1,7 +1,8 @@
 # Environment config directories
 .vscode
 
-# Python build directories
+# Python directories
+.venv
 __pycache__
 build
 dist
