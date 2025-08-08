@@ -50,11 +50,8 @@ dependencies = [
 ]
 
 
-[tool.setuptools]
-package-dir = {"" = "pcap_fuzzer"}
-
 [tool.setuptools.packages.find]
-where = ["pcap_fuzzer"]
+where = ["."]
 
 
 [project.urls]

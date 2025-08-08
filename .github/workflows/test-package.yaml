@@ -17,16 +17,19 @@ jobs:
           python-version: "3.12"
 
       - name: Install Python dependencies
-        run: pip install -r $GITHUB_WORKSPACE/requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Install build package
         run: pip install build
       
       - name: Build package
-        run: python -m build $GITHUB_WORKSPACE
+        run: python -m build .
       
       - name: Install package
-        run: pip install $GITHUB_WORKSPACE
+        run: pip install .
 
       - name: Run package with sample PCAP files
-        run: python $GITHUB_WORKSPACE/.ci_scripts/run-all-pcaps.py
+        run: python .ci_scripts/run-all-pcaps.py
+      
+      - name: Run package as CLI tool
+        run: pcap-fuzzer traces/*.pcap
