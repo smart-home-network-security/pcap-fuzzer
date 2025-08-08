@@ -4,7 +4,6 @@ Randomly edit packet fields in a PCAP file.
 
 ## Import libraries
 import os
-import argparse
 from typing import Union
 import random
 import logging
@@ -14,26 +13,8 @@ import scapy.all as scapy
 from scapy.layers import dhcp, dns, http
 from scapy.contrib import coap, igmp, igmpv3
 # Custom Packet utilities
-from .packet.Packet import Packet
+from .packet import Packet
 
-
-def strictly_positive_int(value: any) -> int:
-    """
-    Custom argparse type for a strictly positive integer value.
-    
-    :param value: argument value to check
-    :return: argument as integer if it is strictly positive
-    :raises argparse.ArgumentTypeError: if argument does not represent a strictly positive integer
-    """
-    try:
-        ivalue = int(value)
-    except ValueError:
-        raise argparse.ArgumentTypeError(f"{value} does not represent an integer.")
-    else:
-        if ivalue < 1:
-            raise argparse.ArgumentTypeError(f"{value} does not represent a strictly positive integer.")
-        return ivalue
-    
 
 def must_edit_packet(i: int, packet_numbers: list, random_range: int) -> bool:
     """
@@ -129,48 +110,3 @@ def fuzz_pcaps(pcaps: Union[str, list], output: str = None, random_range: int = 
         else:
             scapy.wrpcap(output_pcap, new_packets)
             logging.info(f"Wrote output PCAP file: {output_pcap}")
-
-
-if __name__ == "__main__":
-
-    # This script's name
-    script_name = os.path.basename(__file__)
-
-    ### LOGGING CONFIGURATION ###
-    logging.basicConfig(level=logging.INFO)
-    logging.info(f"Starting {script_name}")
-
-
-    ### ARGUMENT PARSING ###
-    parser = argparse.ArgumentParser(
-        prog=script_name,
-        description="Randomly edit packet fields in a PCAP file."
-    )
-    # Positional arguments: input PCAP file(s)
-    parser.add_argument("input_pcaps", metavar="pcap", type=str, nargs="+", help="Input PCAP file(s).")
-    # Optional flag: -o / --output
-    parser.add_argument("-o", "--output", type=str, default=None, help="Output PCAP (and CSV) file path. Used only if a single input file is specified. Default: edited/<input_pcap>.edit.pcap")
-    # Optional flag: -r / --random-range
-    parser.add_argument("-r", "--random-range", type=strictly_positive_int, default=1,
-                        help="Upper bound for random range (not included). Must be a strictly positive integer. Default: 1 (edit each packet).")
-    # Optional flag: -n / --packet-number
-    parser.add_argument("-n", "--packet-number", type=int, action="append",
-                        help="Index of the packet to edit, starting form 1. Can be specifed multiple times.")
-    # Optional flag: -d / --dry-run
-    parser.add_argument("-d", "--dry-run", action="store_true",
-                        help="Dry run: do not write output PCAP file.")
-    # Parse arguments
-    args = parser.parse_args()
-    # Verify arguments
-    if args.output is not None and len(args.input_pcaps) > 1:
-        logging.warning("Multiple input PCAP files specified, ignoring output PCAP file name.")
-
-
-    ### MAIN PROGRAM ###
-    fuzz_pcaps(
-        pcaps=args.input_pcaps,
-        output=args.output,
-        random_range=args.random_range,
-        packet_numbers=args.packet_number,
-        dry_run=args.dry_run
-    )
