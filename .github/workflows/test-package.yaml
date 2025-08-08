@@ -20,8 +20,7 @@ jobs:
       - name: Build package
         run: python3 -m build
       
-      - name: Install package
-        run: pip3 install $GITHUB_WORKSPACE
-
-      - name: Run package on sample PCAP files
-        run: python3 $GITHUB_WORKSPACE/.ci_scripts/run-all-pcaps.py
+      - name: Install package + Test run
+        run: |
+          pip3 install $GITHUB_WORKSPACE
+          python3 $GITHUB_WORKSPACE/.ci_scripts/run-all-pcaps.py
