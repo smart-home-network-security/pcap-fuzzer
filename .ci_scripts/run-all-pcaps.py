@@ -1,5 +1,3 @@
-#!/bin/python3
-
 # Imports
 import os
 from pathlib import Path

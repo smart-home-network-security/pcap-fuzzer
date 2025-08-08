@@ -10,17 +10,23 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install Python dependencies
-        run: pip3 install -r $GITHUB_WORKSPACE/requirements.txt
+        run: pip install -r $GITHUB_WORKSPACE/requirements.txt
 
       - name: Install build package
-        run: pip3 install build
+        run: pip install build
       
       - name: Build package
-        run: python3 -m build
+        run: python -m build $GITHUB_WORKSPACE
       
-      - name: Install package + Test run
-        run: |
-          pip3 install $GITHUB_WORKSPACE
-          python3 $GITHUB_WORKSPACE/.ci_scripts/run-all-pcaps.py
+      - name: Install package
+        run: pip install $GITHUB_WORKSPACE
+
+      - name: Run package with sample PCAP files
+        run: python $GITHUB_WORKSPACE/.ci_scripts/run-all-pcaps.py
