@@ -1,0 +1,27 @@
+name: test-package
+on: [push]
+
+
+jobs:
+
+  test-package:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python dependencies
+        run: pip3 install -r $GITHUB_WORKSPACE/requirements.txt
+
+      - name: Install build package
+        run: pip3 install build
+      
+      - name: Build package
+        run: python3 -m build
+      
+      - name: Install package
+        run: pip3 install $GITHUB_WORKSPACE
+
+      - name: Run package on sample PCAP files
+        run: python3 $GITHUB_WORKSPACE/.ci_scripts/run-all-pcaps.py
